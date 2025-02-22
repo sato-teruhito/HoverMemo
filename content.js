@@ -174,7 +174,7 @@
       });
     }
     
-    // ツールチップを表示
+    // ツールチップを表示sssss
     function showTooltip(element, text) {
       const tooltip = document.createElement('div');
       tooltip.className = 'page-notes-tooltip';
