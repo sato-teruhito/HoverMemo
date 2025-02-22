@@ -129,7 +129,7 @@
     
       closeBtn.addEventListener('click', () => {
         commentWindow.remove();
-        
+
         commentWindow = null;
       });
     
@@ -174,7 +174,7 @@
       });
     }
     
-    // ツールチップを表示
+    // ツールチップを表示　ああああああ
     function showTooltip(element, text) {
       const tooltip = document.createElement('div');
       tooltip.className = 'page-notes-tooltip';
