@@ -164,7 +164,6 @@
           const notes = result.pageNotes || {};
           
           if (notes[url]) {
-            highlightLinksWithComments();
             showTooltip(link, notes[url]);
           }
         });
@@ -218,6 +217,7 @@
       }
     });
     
+    highlightLinksWithComments();
     // 検索結果ページでのホバー機能を初期化
     setupSearchResultsHover();
         
