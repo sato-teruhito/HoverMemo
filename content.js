@@ -13,11 +13,15 @@ function createCommentWindow() {
     </div>
     <textarea class="page-notes-textarea"></textarea>
     <div class="page-notes-selection">
-      <label>
-        <input type="radio" name="useful" value="yes"> 〇
+      <label class="selection-button yes">
+        <input type="radio" name="useful" value="yes">
+        <span class="selection-icon">〇</span>
+        役立つ
       </label>
-      <label>
-        <input type="radio" name="useful" value="no"> ×
+      <label class="selection-button no">
+        <input type="radio" name="useful" value="no">
+        <span class="selection-icon">×</span>
+        役立たない
       </label>
     </div>
     <button class="page-notes-save">保存</button>
@@ -30,6 +34,18 @@ function createCommentWindow() {
   const saveBtn = commentWindow.querySelector('.page-notes-save');
   const textarea = commentWindow.querySelector('.page-notes-textarea');
   const radios = commentWindow.querySelectorAll('input[name="useful"]');
+
+  // ラジオボタンの選択状態を視覚的に表示
+  radios.forEach(radio => {
+    radio.addEventListener('change', () => {
+      // 全ての選択ボタンからselectedクラスを削除
+      document.querySelectorAll('.selection-button').forEach(btn => {
+        btn.classList.remove('selected');
+      });
+      // 選択されたボタンにselectedクラスを追加
+      radio.closest('.selection-button').classList.add('selected');
+    });
+  });
 
   closeBtn.addEventListener('click', () => {
     commentWindow.remove();
