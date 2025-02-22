@@ -164,6 +164,7 @@
           const notes = result.pageNotes || {};
           
           if (notes[url]) {
+            highlightLinksWithComments();
             showTooltip(link, notes[url]);
           }
         });
@@ -193,6 +194,21 @@
       if (tooltip) {
         tooltip.remove();
       }
+    }
+
+    function highlightLinksWithComments() {
+      const links = document.querySelectorAll("a");
+  
+      chrome.storage.local.get(null, (storedNotes) => {
+          links.forEach(link => {
+              const href = link.href;
+              if (storedNotes[href]) {
+                  link.style.borderBottom = "2px dashed orange !important"; // 強制適用
+                  link.style.textDecoration = "none"; // デフォルトの下線を削除
+                  link.style.display = "inline-block"; // 確実に適用
+              }
+          });
+      });
     }
     
     // メッセージリスナー
