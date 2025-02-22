@@ -122,18 +122,38 @@ function hideTooltip() {
 function highlightLinksWithComments() {
   const links = document.querySelectorAll("a");
 
-  chrome.storage.local.get(null, (storedNotes) => {
+  chrome.storage.local.get(['pageNotes'], (result) => {
+    const notes = result.pageNotes || {};
+    
     links.forEach(link => {
       const href = link.href;
-      if (storedNotes[href]) {
-        const noteData = storedNotes[href];
+      if (notes[href]) {
+        const noteData = notes[href];
         // 選択結果に応じて色を変更
-        const borderColor = noteData.useful === 'yes' ? 'green' : 'red';
-        link.style.borderBottom = `2px solid ${borderColor}`; 
-        link.style.textDecoration = "none";
-        link.style.display = "inline-block";
+        const borderColor = noteData.useful === 'yes' ? '#4CAF50' : '#f44336';
+        
+        // !importantを使用して確実にスタイルを適用
+        link.style.cssText = `
+          border-bottom: 2px solid ${borderColor} !important;
+          text-decoration: none !important;
+          display: inline-block;
+        `;
       }
     });
+  });
+}
+
+// スタイルの即時適用のため、MutationObserverを使用
+function setupLinkObserver() {
+  const observer = new MutationObserver((mutations) => {
+    highlightLinksWithComments();
+  });
+
+  // 検索結果のコンテナ要素を監視
+  const searchResults = document.querySelector('#search') || document.body;
+  observer.observe(searchResults, {
+    childList: true,
+    subtree: true
   });
 }
 
@@ -144,6 +164,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 });
 
-highlightLinksWithComments();
-// 検索結果ページでのホバー機能を初期化
-setupSearchResultsHover();
+// 初期化処理
+document.addEventListener('DOMContentLoaded', () => {
+  highlightLinksWithComments();
+  setupSearchResultsHover();
+  setupLinkObserver();
+});
+
+// ページロード完了時にも実行
+window.addEventListener('load', () => {
+  highlightLinksWithComments();
+});
