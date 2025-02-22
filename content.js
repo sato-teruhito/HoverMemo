@@ -129,6 +129,7 @@
     
       closeBtn.addEventListener('click', () => {
         commentWindow.remove();
+        
         commentWindow = null;
       });
     
