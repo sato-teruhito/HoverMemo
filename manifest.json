@@ -1,11 +1,11 @@
 {
   "manifest_version": 3,
-  "name": "PUMP -Pop up Memo Pad-",
+  "name": "Page Notes",
   "version": "1.0",
   "description": "ウェブページにコメントを追加・表示できる拡張機能",
   "permissions": ["storage", "activeTab"],
   "action": {
-    "default_title": "PUMP -Pop up Memo Pad-"
+    "default_title": "Page Notes"
   },
   "background": {
     "service_worker": "background.js"
@@ -24,10 +24,5 @@
       },
       "description": "コメント入力ウィンドウを開く"
     }
-  },
-  "icons": {
-    "16": "icons/icon1.png",
-    "48": "icons/icon2.png",
-    "128": "icons/icon3.png"
   }
 }
