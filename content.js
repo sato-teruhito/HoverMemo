@@ -1,207 +1,399 @@
-// content.js
+let commentWindow = null;
+let isDragging = false;
+let currentX;
+let currentY;
+let initialX;
+let initialY;
+let xOffset = 0;
+let yOffset = 0;
 
-/*window.addEventListener("load", () => {
-    const currentURL = window.location.href;
-  
-    // 遷移先ページならコメント表示用ポップアップを出す
-    if (!isSearchResultsPage(currentURL)) {
-      chrome.storage.local.get([currentURL], (result) => {
-        if (result[currentURL]) {
-          showTooltip(result[currentURL], currentURL);
+// コメントウィンドウを作成
+function createCommentWindow() {
+  if (commentWindow) return;
+
+  const url = window.location.href;
+
+  chrome.storage.local.get(["pageNotes"], async (result) => {
+    const notes = result.pageNotes || {};
+    const existingNote = notes[url] || {};
+    const existingComment = existingNote.text || "";
+    const existingUseful = existingNote.useful || "";
+
+    commentWindow = document.createElement("div");
+    commentWindow.className = "page-notes-window";
+    commentWindow.innerHTML = `
+      <div class="page-notes-header">
+        <span>メモを残そう！</span>
+        <button class="page-notes-close">×</button>
+      </div>
+      <textarea class="page-notes-textarea">${existingComment}</textarea>
+      <div class="page-notes-selection">
+        <label class="selection-button yes ${
+          existingUseful === "yes" ? "selected" : ""
+        }">
+          <input type="radio" name="useful" value="yes" ${
+            existingUseful === "yes" ? "checked" : ""
+          }>
+          <span class="selection-icon">〇</span> 役立つ
+        </label>
+        <label class="selection-button no ${
+          existingUseful === "no" ? "selected" : ""
+        }">
+          <input type="radio" name="useful" value="no" ${
+            existingUseful === "no" ? "checked" : ""
+          }>
+          <span class="selection-icon">×</span> 役立たない
+        </label>
+      </div>
+      <div class="page-notes-buttons">
+        ${
+          existingComment
+            ? `<button class="page-notes-save page-notes-update">メモ更新</button>`
+            : `<button class="page-notes-save page-notes-create">メモ作成</button>`
         }
-      });
-    } else {
-      // 検索結果ページならリンクを走査してコメント表示
-      highlightLinksWithComments();
-    }
-  });
-  
-  function isSearchResultsPage(url) {
-    return url.includes("google.com/search") || url.includes("bing.com/search");
-  }
-  
-  function showTooltip(note, url) {
-    const tooltip = document.createElement("div");
-    tooltip.innerText = note;
-    tooltip.style.position = "fixed";
-    tooltip.style.bottom = "20px";
-    tooltip.style.right = "20px";
-    tooltip.style.backgroundColor = "#f9f9f9";
-    tooltip.style.border = "1px solid #ccc";
-    tooltip.style.padding = "10px";
-    tooltip.style.borderRadius = "5px";
-    tooltip.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.2)";
-    tooltip.style.zIndex = "10000";
-  
-    const editButton = document.createElement("button");
-    editButton.innerText = "編集";
-    editButton.style.marginRight = "5px";
-    editButton.onclick = () => editNote(url, note);
-  
-    const deleteButton = document.createElement("button");
-    deleteButton.innerText = "削除";
-    deleteButton.onclick = () => deleteNote(url, tooltip);
-  
-    tooltip.appendChild(document.createElement("br"));
-    tooltip.appendChild(editButton);
-    tooltip.appendChild(deleteButton);
-  
-    document.body.appendChild(tooltip);
-  }
-  
-  function editNote(url, currentNote) {
-    const newNote = prompt("新しいコメントを入力してください:", currentNote);
-    if (newNote !== null) {
-      chrome.storage.local.set({ [url]: newNote }, () => {
-        alert("コメントを更新しました！");
-        location.reload();
-      });
-    }
-  }
-  
-  function deleteNote(url, tooltip) {
-    if (confirm("このコメントを削除しますか？")) {
-      chrome.storage.local.remove(url, () => {
-        alert("コメントを削除しました。");
-        tooltip.remove();
-      });
-    }
-  }
-  
-  function highlightLinksWithComments() {
-    const links = document.querySelectorAll("a");
-  
-    chrome.storage.local.get(null, (storedNotes) => {
-      links.forEach(link => {
-        const href = link.href;
-        if (storedNotes[href]) {
-          link.style.borderBottom = "2px dashed orange";
-          link.addEventListener("mouseenter", () => showHoverNote(link, storedNotes[href]));
-          link.addEventListener("mouseleave", hideHoverNote);
+        ${
+          existingComment
+            ? `<button class="page-notes-delete">メモ削除</button>`
+            : ""
+        }
+      </div>
+    `;
+
+    document.body.appendChild(commentWindow);
+
+    // テキストエリアを取得
+    const textarea = commentWindow.querySelector(".page-notes-textarea");
+
+    // ウィンドウを中央に配置
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+    const boxWidth = commentWindow.offsetWidth;
+    const boxHeight = commentWindow.offsetHeight;
+
+    const centerX = (windowWidth - boxWidth) / 2;
+    const centerY = (windowHeight - boxHeight) / 2;
+
+    setTranslate(centerX, centerY);
+
+    // ドラッグ機能の初期化
+    initDraggable();
+
+    // イベントリスナーの設定
+    const closeBtn = commentWindow.querySelector(".page-notes-close");
+    const saveBtn = commentWindow.querySelector(".page-notes-save");
+    const deleteBtn = commentWindow.querySelector(".page-notes-delete");
+    //const textarea = commentWindow.querySelector(".page-notes-textarea");
+    const radios = commentWindow.querySelectorAll("input[name='useful']");
+    const selectionButtons =
+      commentWindow.querySelectorAll(".selection-button");
+
+    closeBtn.addEventListener("click", () => {
+      cleanupDraggable(); // ドラッグイベントのクリーンアップを追加
+      commentWindow.remove();
+      commentWindow = null;
+    });
+
+    // 選択ボタンのスタイル更新
+    selectionButtons.forEach((button) => {
+      const radio = button.querySelector('input[type="radio"]');
+      radio.addEventListener("change", () => {
+        selectionButtons.forEach((b) => b.classList.remove("selected"));
+        if (radio.checked) {
+          button.classList.add("selected");
         }
       });
     });
-  }
-  
-  function showHoverNote(link, note) {
-    const hoverNote = document.createElement("div");
-    hoverNote.className = "hover-note";
-    hoverNote.innerText = note;
-    hoverNote.style.position = "absolute";
-    hoverNote.style.backgroundColor = "#fff8dc";
-    hoverNote.style.border = "1px solid #ccc";
-    hoverNote.style.padding = "5px";
-    hoverNote.style.borderRadius = "5px";
-    hoverNote.style.boxShadow = "0 2px 6px rgba(0, 0, 0, 0.2)";
-    hoverNote.style.zIndex = "10000";
-  
-    link.appendChild(hoverNote);
-  }
-  
-  function hideHoverNote() {
-    const note = document.querySelector(".hover-note");
-    if (note) note.remove();
-  } */
-  
-    let commentWindow = null;
 
-    // コメントウィンドウを作成
-    function createCommentWindow() {
-      if (commentWindow) return;
-    
-      commentWindow = document.createElement('div');
-      commentWindow.className = 'page-notes-window';
-      commentWindow.innerHTML = `
-        <div class="page-notes-header">
-          <span>コメントを追加</span>
-          <button class="page-notes-close">×</button>
-        </div>
-        <textarea class="page-notes-textarea"></textarea>
-        <button class="page-notes-save">保存</button>
-      `;
-    
-      document.body.appendChild(commentWindow);
-    
-      // イベントリスナーの設定
-      const closeBtn = commentWindow.querySelector('.page-notes-close');
-      const saveBtn = commentWindow.querySelector('.page-notes-save');
-      const textarea = commentWindow.querySelector('.page-notes-textarea');
-    
-      closeBtn.addEventListener('click', () => {
+    closeBtn.addEventListener("click", () => {
+      commentWindow.remove();
+      commentWindow = null;
+    });
+
+    saveBtn.addEventListener("click", () => {
+      const comment = textarea.value;
+      const selectedUseful = Array.from(radios).find(
+        (radio) => radio.checked
+      )?.value;
+      if (comment && selectedUseful) {
+        saveComment(comment, selectedUseful);
         commentWindow.remove();
-
         commentWindow = null;
-      });
-    
-      saveBtn.addEventListener('click', () => {
-        const comment = textarea.value;
-        if (comment) {
-          saveComment(comment);
+      }
+    });
+
+    if (deleteBtn) {
+      deleteBtn.addEventListener("click", () => {
+        if (confirm("このメモを削除してもよろしいですか？")) {
+          deleteComment();
           commentWindow.remove();
           commentWindow = null;
         }
       });
     }
-    
-    // コメントを保存
-    function saveComment(comment) {
-      const url = window.location.href;
-      chrome.storage.local.get(['pageNotes'], (result) => {
-        const notes = result.pageNotes || {};
-        notes[url] = comment;
-        chrome.storage.local.set({ pageNotes: notes });
-      });
-    }
-    
-    // 検索結果ページでのホバー表示処理
-    function setupSearchResultsHover() {
-      const links = document.querySelectorAll('a');
-      
-      links.forEach(link => {
-        link.addEventListener('mouseenter', async () => {
-          const url = link.href;
-          const result = await chrome.storage.local.get(['pageNotes']);
-          const notes = result.pageNotes || {};
-          
-          if (notes[url]) {
-            showTooltip(link, notes[url]);
-          }
-        });
-        
-        link.addEventListener('mouseleave', () => {
-          hideTooltip();
-        });
-      });
-    }
-    
-    // ツールチップを表示　ああああああ
-    function showTooltip(element, text) {
-      const tooltip = document.createElement('div');
-      tooltip.className = 'page-notes-tooltip';
-      tooltip.textContent = text;
-      
-      const rect = element.getBoundingClientRect();
-      tooltip.style.top = `${rect.bottom + window.scrollY}px`;
-      tooltip.style.left = `${rect.left + window.scrollX}px`;
-      
-      document.body.appendChild(tooltip);
-    }
-    
-    // ツールチップを非表示
-    function hideTooltip() {
-      const tooltip = document.querySelector('.page-notes-tooltip');
-      if (tooltip) {
-        tooltip.remove();
-      }
-    }
-    
-    // メッセージリスナー
-    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-      if (request.action === "openCommentWindow") {
-        createCommentWindow();
+
+    // テキストエリアにフォーカスを当てる
+    // フォーカスが確実に当たるように、setTimeout を使用
+    setTimeout(() => {
+      textarea.focus();
+      // カーソルを末尾に移動
+      textarea.selectionStart = textarea.selectionEnd = textarea.value.length;
+    }, 0);
+  });
+}
+
+// コメントを保存
+function saveComment(comment, useful) {
+  const url = new URL(window.location.href).toString();
+  chrome.storage.local.get(["pageNotes"], (result) => {
+    const notes = result.pageNotes || {};
+    notes[url] = {
+      text: comment,
+      useful: useful,
+    };
+    chrome.storage.local.set({ pageNotes: notes }, () => {
+      updateLinkStyles();
+    });
+  });
+}
+
+// リンクのスタイルを更新
+function updateLinkStyles() {
+  chrome.storage.local.get(["pageNotes"], (result) => {
+    const notes = result.pageNotes || {};
+    const links = document.querySelectorAll("a:has(h3)");
+
+    links.forEach((link) => {
+      // href属性がない場合はスキップ
+      if (!link.href) return;
+
+      // 完全なURLを取得
+      const url = new URL(link.href).toString();
+      const noteData = notes[url];
+
+      // 既存のスタイルをリセット
+      link.classList.remove("useful-yes", "useful-no");
+
+      if (noteData && noteData.useful) {
+        const className =
+          noteData.useful === "yes" ? "useful-yes" : "useful-no";
+        link.classList.add(className);
       }
     });
-    
-    // 検索結果ページでのホバー機能を初期化
+  });
+}
+
+// コメントを削除
+function deleteComment() {
+  const url = new URL(window.location.href).toString();
+  try {
+    chrome.storage.local.get(["pageNotes"], (result) => {
+      const notes = result.pageNotes || {};
+      delete notes[url];
+      chrome.storage.local.set({ pageNotes: notes }, () => {
+        updateLinkStyles();
+        setupSearchResultsHover();
+      });
+    });
+  } catch (error) {
+    console.error("Error in deleteComment:", error);
+  }
+}
+
+// 検索結果ページでのホバー表示処理
+function setupSearchResultsHover() {
+  const links = document.querySelectorAll("a:has(h3)");
+
+  links.forEach((link) => {
+    // href属性がない場合はスキップ
+    if (!link.href) return;
+    link.addEventListener("mouseenter", async () => {
+      try {
+        if (!isExtensionContextValid()) {
+          return;
+        }
+
+        const url = link.href;
+        const result = await chrome.storage.local.get(["pageNotes"]);
+        const notes = result.pageNotes || {};
+
+        if (notes[url]) {
+          showTooltip(link, notes[url]);
+        }
+      } catch (error) {
+        console.error("Error in hover handler:", error);
+        hideTooltip();
+      }
+    });
+
+    link.addEventListener("mouseleave", () => {
+      try {
+        hideTooltip();
+      } catch (error) {
+        console.error("Error in mouseleave handler:", error);
+      }
+    });
+  });
+}
+
+// ツールチップを表示
+function showTooltip(element, noteData) {
+  try {
+    const tooltip = document.createElement("div");
+    tooltip.className = "page-notes-tooltip";
+
+    const usefulStatus =
+      noteData.useful === "yes" ? "〇 役立つ" : "× 役立たない";
+    tooltip.innerHTML = `
+      <div class="tooltip-status ${noteData.useful}">${usefulStatus}</div>
+      <div class="tooltip-text">${noteData.text}</div>
+    `;
+
+    const rect = element.getBoundingClientRect();
+    tooltip.style.top = `${rect.bottom + window.scrollY}px`;
+    tooltip.style.left = `${rect.left + window.scrollX}px`;
+
+    document.body.appendChild(tooltip);
+  } catch (error) {
+    console.error("Error in showTooltip:", error);
+  }
+}
+
+// ツールチップを非表示
+function hideTooltip() {
+  try {
+    const tooltip = document.querySelector(".page-notes-tooltip");
+    if (tooltip) {
+      tooltip.remove();
+    }
+  } catch (error) {
+    console.error("Error in hideTooltip:", error);
+  }
+}
+
+// 拡張機能のコンテキストが有効かチェックする関数
+function isExtensionContextValid() {
+  try {
+    return chrome.runtime.id !== undefined;
+  } catch (e) {
+    return false;
+  }
+}
+
+let isConnected = false;
+
+// 拡張機能の準備完了を通知
+function notifyReady() {
+  isConnected = true;
+  chrome.runtime.sendMessage({ action: "contentScriptReady" });
+}
+
+// メッセージリスナー
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (!isExtensionContextValid()) {
+    console.error("Extension context invalid");
+    return;
+  }
+
+  if (request.action === "openCommentWindow") {
+    try {
+      createCommentWindow();
+      sendResponse({ success: true });
+    } catch (error) {
+      console.error("Error in openCommentWindow:", error);
+      sendResponse({ success: false, error: error.message });
+    }
+  }
+  return true;
+});
+
+// 初期化処理
+function initialize() {
+  if (!isExtensionContextValid()) {
+    console.error("Extension context invalid during initialization");
+    return;
+  }
+
+  try {
     setupSearchResultsHover();
-        
+    updateLinkStyles();
+    notifyReady();
+  } catch (error) {
+    console.error("Error during initialization:", error);
+  }
+}
+
+// ページ読み込み完了時に初期化
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initialize);
+} else {
+  initialize();
+}
+
+// ドラッグ機能の初期化
+function initDraggable() {
+  const header = commentWindow.querySelector(".page-notes-header");
+  header.style.cursor = "move";
+
+  header.addEventListener("mousedown", dragStart);
+  document.addEventListener("mousemove", drag);
+  document.addEventListener("mouseup", dragEnd);
+}
+
+// ドラッグイベントのクリーンアップ
+function cleanupDraggable() {
+  document.removeEventListener("mousemove", drag);
+  document.removeEventListener("mouseup", dragEnd);
+  isDragging = false;
+}
+
+function dragStart(e) {
+  if (!commentWindow) return; // nullチェックを追加
+
+  const windowRect = commentWindow.getBoundingClientRect();
+  initialX = e.clientX - windowRect.left;
+  initialY = e.clientY - windowRect.top;
+
+  if (
+    e.target.closest(".page-notes-header") &&
+    !e.target.closest(".page-notes-close")
+  ) {
+    isDragging = true;
+    commentWindow.classList.add("dragging");
+  }
+}
+
+function drag(e) {
+  if (!isDragging || !commentWindow) return; // nullチェックを追加
+  e.preventDefault();
+
+  const newX = e.clientX - initialX;
+  const newY = e.clientY - initialY;
+
+  // ウィンドウが画面外に出ないように制限
+  const windowWidth = window.innerWidth;
+  const windowHeight = window.innerHeight;
+  const boxWidth = commentWindow.offsetWidth;
+  const boxHeight = commentWindow.offsetHeight;
+
+  const x = Math.min(Math.max(0, newX), windowWidth - boxWidth);
+  const y = Math.min(Math.max(0, newY), windowHeight - boxHeight);
+
+  setTranslate(x, y);
+}
+
+function dragEnd() {
+  if (!commentWindow) return; // nullチェックを追加
+
+  initialX = currentX;
+  initialY = currentY;
+  isDragging = false;
+  commentWindow.classList.remove("dragging");
+}
+
+function setTranslate(x, y) {
+  if (!commentWindow) return; // nullチェックを追加
+
+  currentX = x;
+  currentY = y;
+  commentWindow.style.transform = `translate(${x}px, ${y}px)`;
+}
