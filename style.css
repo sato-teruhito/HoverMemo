@@ -1,13 +1,15 @@
+/* メインウィンドウのスタイル */
 .page-notes-window {
   position: fixed;
   top: 0;
   left: 0;
-  width: 300px;
+  width: 320px;
   background: white;
   border: 1px solid #ccc;
   border-radius: 4px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   z-index: 10000;
+  box-sizing: border-box;
 }
 
 /* ドラッグ中のスタイル */
@@ -17,30 +19,41 @@
   transition: box-shadow 0.3s ease;
 }
 
-.page-notes-header {
+/* ヘッダー */
+.page-notes-header,
+.side-menu-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px;
+  padding: 12px;
   border-bottom: 1px solid #eee;
-  user-select: none; /* ドラッグ中のテキスト選択を防ぐ */
+  background: #f1f1f1;
+  user-select: none;
 }
 
-.page-notes-close {
+/* ボタン共通スタイル */
+.page-notes-close,
+.page-notes-menu,
+.side-menu-close {
   border: none;
   background: none;
   cursor: pointer;
   font-size: 18px;
 }
 
+/* テキストエリア */
 .page-notes-textarea {
   width: 100%;
   height: 150px;
-  padding: 8px;
+  padding: 12px;
   border: none;
   resize: none;
+  box-sizing: border-box;
+  font-size: 14px;
+  line-height: 1.5;
 }
 
+/* 有用性選択部分 */
 .page-notes-selection {
   display: flex;
   justify-content: center;
@@ -88,31 +101,44 @@
   font-weight: bold;
 }
 
+/* ボタン領域 */
 .page-notes-buttons {
-  padding: 8px;
   display: flex;
   gap: 8px;
+  padding: 12px;
+  box-sizing: border-box;
 }
 
+/* 保存ボタン */
 .page-notes-save {
   flex: 1;
   padding: 8px;
-  background: #4caf50;
   color: white;
   border: none;
-  border-radius: 4px;
   cursor: pointer;
+  border-radius: 4px;
 }
 
+.page-notes-create {
+  background: #4caf50;
+}
+
+.page-notes-update {
+  background: #2196f3;
+}
+
+/* 削除ボタン */
 .page-notes-delete {
-  padding: 8px 16px;
+  flex: 1;
+  padding: 8px;
   background: #f44336;
   color: white;
   border: none;
-  border-radius: 4px;
   cursor: pointer;
+  border-radius: 4px;
 }
 
+/* ツールチップ */
 .page-notes-tooltip {
   position: absolute;
   background: rgba(0, 0, 0, 0.8);
@@ -141,7 +167,21 @@
   white-space: pre-wrap;
 }
 
-/* 既存のCSSはそのままで、リンクのスタイルを修正 */
+/* サイドメニュー */
+.side-menu-window {
+  position: fixed;
+  top: 50%;
+  right: 20px;
+  width: 250px;
+  background: white;
+  border: 1px solid #ccc;
+  padding: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  transform: translateY(-50%);
+  z-index: 10000;
+}
+
+/* リンクスタイル */
 .useful-yes {
   border-bottom: 2px solid #4caf50 !important;
   text-decoration: none !important;
@@ -152,7 +192,6 @@
   text-decoration: none !important;
 }
 
-/* リンクホバー時のスタイルを維持 */
 .useful-yes:hover,
 .useful-no:hover {
   text-decoration: none !important;
