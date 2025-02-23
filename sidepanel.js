@@ -42,37 +42,47 @@ let filters = {
           chrome.tabs.create({ url: url });
         });
   
+        // 情報行のコンテナを作成
+        const infoRow = document.createElement("div");
+        infoRow.className = "note-info-row";
+
         const date = document.createElement("div");
         date.className = "note-date";
         date.textContent = `📅 ${noteData.date || "不明な日付"}`;
-  
+
         const useful = document.createElement("div");
         useful.className = `note-useful ${noteData.useful === "yes" ? "useful-yes" : "useful-no"}`;
         useful.textContent = noteData.useful === "yes" ? "〇 役立つ" : "× 役立たない";
-  
-        const comment = document.createElement("div");
-        comment.className = "note-comment";
-        comment.textContent = noteData.comment || "（メモなし）";
-  
+
         const deleteBtn = document.createElement("button");
         deleteBtn.className = "delete-btn";
         deleteBtn.textContent = "🗑 削除";
         deleteBtn.addEventListener("click", () => {
-          if (confirm(`「${noteData.title}」のメモを削除しますか？`)) {
+            if (confirm(`「${noteData.title}」のメモを削除しますか？`)) {
             delete notes[url];
             chrome.storage.local.set({ pageNotes: notes }, () => {
-              updateNotesList();
+                updateNotesList();
             });
-          }
+            }
         });
+
+        //コメント部分
+        const comment = document.createElement("div");
+        comment.className = "note-comment";
+        comment.textContent = noteData.comment || "（メモなし）";
   
+        // 情報行に要素を追加
+        infoRow.appendChild(date);
+        infoRow.appendChild(useful);
+        infoRow.appendChild(deleteBtn);
+
+        // noteItemに要素を追加
         noteItem.appendChild(title);
-        noteItem.appendChild(date);
-        noteItem.appendChild(useful);
+        noteItem.appendChild(infoRow);
         noteItem.appendChild(comment);
-        noteItem.appendChild(deleteBtn);
+
         notesList.appendChild(noteItem);
-      }
+        }
     });
   }
   
