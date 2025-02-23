@@ -30,7 +30,7 @@ function createCommentWindow() {
     commentWindow.innerHTML = `
       <div class="page-notes-header">
         <span>メモを残そう！</span>
-        <button class="page-notes-menu">☰</button>
+        <button class="page-notes-menu">メモ一覧</button>
         <button class="page-notes-close">×</button>
       </div>
       <textarea class="page-notes-textarea">${existingComment}</textarea>
