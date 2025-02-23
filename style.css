@@ -150,13 +150,13 @@
 .useful-yes {
   text-decoration: underline;
   text-decoration-color: #4CAF50;
-  text-decoration-thickness: 2px;
+  text-decoration-thickness: 10px;
 }
 
 .useful-no {
   text-decoration: underline;
   text-decoration-color: #f44336;
-  text-decoration-thickness: 2px;
+  text-decoration-thickness: 10px;
 }r {
   display: flex;
   justify-content: space-between;
