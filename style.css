@@ -20,7 +20,8 @@
 }
 
 /* ヘッダー */
-.page-notes-header, .side-menu-header {
+.page-notes-header,
+.side-menu-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -31,7 +32,9 @@
 }
 
 /* ボタン共通スタイル */
-.page-notes-close, .page-notes-menu, .side-menu-close {
+.page-notes-close,
+.page-notes-menu,
+.side-menu-close {
   border: none;
   background: none;
   cursor: pointer;

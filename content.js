@@ -18,11 +18,11 @@ function createCommentWindow() {
     const notes = result.pageNotes || {};
     const existingNote = notes[url] || {};
 
-
     // commentプロパティがある場合はそれを使用、オブジェクトでない場合は直接値を使用
-    const existingComment = typeof existingNote === "object" ? 
-      (existingNote.comment || "") : 
-      (existingNote || "");
+    const existingComment =
+      typeof existingNote === "object"
+        ? existingNote.comment || ""
+        : existingNote || "";
     const existingUseful = existingNote.useful || "";
 
     commentWindow = document.createElement("div");
@@ -35,20 +35,34 @@ function createCommentWindow() {
       </div>
       <textarea class="page-notes-textarea">${existingComment}</textarea>
       <div class="page-notes-selection">
-        <label class="selection-button yes ${existingUseful === "yes" ? "selected" : ""}">
-          <input type="radio" name="useful" value="yes" ${existingUseful === "yes" ? "checked" : ""}>
+        <label class="selection-button yes ${
+          existingUseful === "yes" ? "selected" : ""
+        }">
+          <input type="radio" name="useful" value="yes" ${
+            existingUseful === "yes" ? "checked" : ""
+          }>
           <span class="selection-icon">〇</span> 役立つ
         </label>
-        <label class="selection-button no ${existingUseful === "no" ? "selected" : ""}">
-          <input type="radio" name="useful" value="no" ${existingUseful === "no" ? "checked" : ""}>
+        <label class="selection-button no ${
+          existingUseful === "no" ? "selected" : ""
+        }">
+          <input type="radio" name="useful" value="no" ${
+            existingUseful === "no" ? "checked" : ""
+          }>
           <span class="selection-icon">×</span> 役立たない
         </label>
       </div>
       <div class="page-notes-buttons">
-        ${existingComment 
-          ? `<button class="page-notes-save page-notes-update">メモ更新</button>` 
-          : `<button class="page-notes-save page-notes-create">メモ作成</button>`}
-        ${existingComment ? `<button class="page-notes-delete">メモ削除</button>` : ""}
+        ${
+          existingComment
+            ? `<button class="page-notes-save page-notes-update">メモ更新</button>`
+            : `<button class="page-notes-save page-notes-create">メモ作成</button>`
+        }
+        ${
+          existingComment
+            ? `<button class="page-notes-delete">メモ削除</button>`
+            : ""
+        }
       </div>
     `;
 
@@ -71,7 +85,8 @@ function createCommentWindow() {
     const deleteBtn = commentWindow.querySelector(".page-notes-delete");
     const textarea = commentWindow.querySelector(".page-notes-textarea");
     const radios = commentWindow.querySelectorAll("input[name='useful']");
-    const selectionButtons = commentWindow.querySelectorAll(".selection-button");
+    const selectionButtons =
+      commentWindow.querySelectorAll(".selection-button");
     const openMenuBtn = commentWindow.querySelector(".page-notes-menu");
 
     // ドラッグ機能の初期化
@@ -100,7 +115,9 @@ function createCommentWindow() {
 
     saveBtn.addEventListener("click", () => {
       const comment = textarea.value;
-      const selectedUseful = Array.from(radios).find((radio) => radio.checked)?.value;
+      const selectedUseful = Array.from(radios).find(
+        (radio) => radio.checked
+      )?.value;
       if (comment && selectedUseful) {
         saveComment(comment, selectedUseful);
         commentWindow.remove();
@@ -163,12 +180,15 @@ function updateNotesList() {
     notesList.innerHTML = "";
 
     for (const [url, data] of Object.entries(notes)) {
-      const noteData = typeof data === "string" ? { 
-        title: "不明なページ", 
-        comment: data, 
-        date: "不明な日付",
-        useful: "" 
-      } : data;
+      const noteData =
+        typeof data === "string"
+          ? {
+              title: "不明なページ",
+              comment: data,
+              date: "不明な日付",
+              useful: "",
+            }
+          : data;
 
       const listItem = document.createElement("li");
       listItem.style.marginBottom = "10px";
@@ -187,7 +207,12 @@ function updateNotesList() {
       date.style.display = "block";
 
       const useful = document.createElement("span");
-      useful.textContent = noteData.useful === "yes" ? "〇 役立つ" : noteData.useful === "no" ? "× 役立たない" : "";
+      useful.textContent =
+        noteData.useful === "yes"
+          ? "〇 役立つ"
+          : noteData.useful === "no"
+          ? "× 役立たない"
+          : "";
       useful.style.display = "block";
 
       const comment = document.createElement("span");
@@ -241,7 +266,7 @@ function saveComment(comment, useful) {
 // コメントを削除
 function deleteComment(specificUrl) {
   const url = specificUrl || window.location.href;
-  
+
   chrome.storage.local.get(["pageNotes"], (result) => {
     const notes = result.pageNotes || {};
     delete notes[url];
@@ -268,7 +293,8 @@ function updateLinkStyles() {
       link.classList.remove("useful-yes", "useful-no");
 
       if (noteData && noteData.useful) {
-        const className = noteData.useful === "yes" ? "useful-yes" : "useful-no";
+        const className =
+          noteData.useful === "yes" ? "useful-yes" : "useful-no";
         link.classList.add(className);
       }
     });
@@ -283,13 +309,14 @@ function showTooltip(element, noteData) {
 
     // noteDataがオブジェクトで、commentプロパティがある場合はそれを使用
     // そうでない場合は、noteDataがテキストとして扱われる
-    const text = typeof noteData === 'object' ? noteData.comment : noteData;
-    
+    const text = typeof noteData === "object" ? noteData.comment : noteData;
+
     let tooltipContent = `<div class="tooltip-text">${text}</div>`;
 
     // usefulプロパティが存在する場合は、ステータスも表示
     if (noteData.useful) {
-      const usefulStatus = noteData.useful === "yes" ? "〇 役立つ" : "× 役立たない";
+      const usefulStatus =
+        noteData.useful === "yes" ? "〇 役立つ" : "× 役立たない";
       tooltipContent = `
         <div class="tooltip-status ${noteData.useful}">${usefulStatus}</div>
         ${tooltipContent}
@@ -342,7 +369,10 @@ function dragStart(e) {
   initialX = e.clientX - windowRect.left;
   initialY = e.clientY - windowRect.top;
 
-  if (e.target.closest(".page-notes-header") && !e.target.closest(".page-notes-close")) {
+  if (
+    e.target.closest(".page-notes-header") &&
+    !e.target.closest(".page-notes-close")
+  ) {
     isDragging = true;
     commentWindow.classList.add("dragging");
   }
@@ -389,7 +419,7 @@ function setupSearchResultsHover() {
 
   links.forEach((link) => {
     if (!link.href) return;
-    
+
     link.addEventListener("mouseenter", async () => {
       try {
         if (!isExtensionContextValid()) return;
