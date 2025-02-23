@@ -94,7 +94,7 @@ function createCommentWindow() {
 
 // コメントを保存
 function saveComment(comment, useful) {
-  const url = window.location.href;
+  const url = new URL(window.location.href).toString();
   chrome.storage.local.get(["pageNotes"], (result) => {
     const notes = result.pageNotes || {};
     notes[url] = { 
@@ -114,19 +114,19 @@ function updateLinkStyles() {
     const links = document.querySelectorAll("a");
     
     links.forEach(link => {
-      const url = link.href;
+      // href属性がない場合はスキップ
+      if (!link.href) return;
+      
+      // 完全なURLを取得
+      const url = new URL(link.href).toString();
       const noteData = notes[url];
       
       // 既存のスタイルをリセット
-      link.style.textDecoration = "none";
       link.classList.remove("useful-yes", "useful-no");
       
-      if (noteData) {
-        if (noteData.useful === "yes") {
-          link.classList.add("useful-yes");
-        } else if (noteData.useful === "no") {
-          link.classList.add("useful-no");
-        }
+      if (noteData && noteData.useful) {
+        const className = noteData.useful === "yes" ? "useful-yes" : "useful-no";
+        link.classList.add(className);
       }
     });
   });
@@ -134,7 +134,7 @@ function updateLinkStyles() {
 
 // コメントを削除
 function deleteComment() {
-  const url = window.location.href;
+  const url = new URL(window.location.href).toString();
   try {
     chrome.storage.local.get(["pageNotes"], (result) => {
       const notes = result.pageNotes || {};
@@ -154,6 +154,8 @@ function setupSearchResultsHover() {
   const links = document.querySelectorAll("a");
 
   links.forEach((link) => {
+    // href属性がない場合はスキップ
+    if (!link.href) return;
     link.addEventListener("mouseenter", async () => {
       try {
         if (!isExtensionContextValid()) {
