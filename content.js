@@ -111,7 +111,7 @@ function saveComment(comment, useful) {
 function updateLinkStyles() {
   chrome.storage.local.get(["pageNotes"], (result) => {
     const notes = result.pageNotes || {};
-    const links = document.querySelectorAll("a");
+    const links = document.querySelectorAll("a:has(h3)");
     
     links.forEach(link => {
       // href属性がない場合はスキップ
@@ -151,7 +151,7 @@ function deleteComment() {
 
 // 検索結果ページでのホバー表示処理
 function setupSearchResultsHover() {
-  const links = document.querySelectorAll("a");
+  const links = document.querySelectorAll("a:has(h3)");
 
   links.forEach((link) => {
     // href属性がない場合はスキップ
