@@ -1,4 +1,11 @@
 let commentWindow = null;
+let isDragging = false;
+let currentX;
+let currentY;
+let initialX;
+let initialY;
+let xOffset = 0;
+let yOffset = 0;
 
 // コメントウィンドウを作成
 function createCommentWindow() {
@@ -21,12 +28,20 @@ function createCommentWindow() {
       </div>
       <textarea class="page-notes-textarea">${existingComment}</textarea>
       <div class="page-notes-selection">
-        <label class="selection-button yes ${existingUseful === 'yes' ? 'selected' : ''}">
-          <input type="radio" name="useful" value="yes" ${existingUseful === 'yes' ? 'checked' : ''}>
+        <label class="selection-button yes ${
+          existingUseful === "yes" ? "selected" : ""
+        }">
+          <input type="radio" name="useful" value="yes" ${
+            existingUseful === "yes" ? "checked" : ""
+          }>
           <span class="selection-icon">〇</span> 役立つ
         </label>
-        <label class="selection-button no ${existingUseful === 'no' ? 'selected' : ''}">
-          <input type="radio" name="useful" value="no" ${existingUseful === 'no' ? 'checked' : ''}>
+        <label class="selection-button no ${
+          existingUseful === "no" ? "selected" : ""
+        }">
+          <input type="radio" name="useful" value="no" ${
+            existingUseful === "no" ? "checked" : ""
+          }>
           <span class="selection-icon">×</span> 役立たない
         </label>
       </div>
@@ -46,21 +61,45 @@ function createCommentWindow() {
 
     document.body.appendChild(commentWindow);
 
+    // テキストエリアを取得
+    const textarea = commentWindow.querySelector(".page-notes-textarea");
+
+    // ウィンドウを中央に配置
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+    const boxWidth = commentWindow.offsetWidth;
+    const boxHeight = commentWindow.offsetHeight;
+
+    const centerX = (windowWidth - boxWidth) / 2;
+    const centerY = (windowHeight - boxHeight) / 2;
+
+    setTranslate(centerX, centerY);
+
+    // ドラッグ機能の初期化
+    initDraggable();
+
     // イベントリスナーの設定
     const closeBtn = commentWindow.querySelector(".page-notes-close");
     const saveBtn = commentWindow.querySelector(".page-notes-save");
     const deleteBtn = commentWindow.querySelector(".page-notes-delete");
-    const textarea = commentWindow.querySelector(".page-notes-textarea");
+    //const textarea = commentWindow.querySelector(".page-notes-textarea");
     const radios = commentWindow.querySelectorAll("input[name='useful']");
-    const selectionButtons = commentWindow.querySelectorAll(".selection-button");
+    const selectionButtons =
+      commentWindow.querySelectorAll(".selection-button");
+
+    closeBtn.addEventListener("click", () => {
+      cleanupDraggable(); // ドラッグイベントのクリーンアップを追加
+      commentWindow.remove();
+      commentWindow = null;
+    });
 
     // 選択ボタンのスタイル更新
-    selectionButtons.forEach(button => {
+    selectionButtons.forEach((button) => {
       const radio = button.querySelector('input[type="radio"]');
-      radio.addEventListener('change', () => {
-        selectionButtons.forEach(b => b.classList.remove('selected'));
+      radio.addEventListener("change", () => {
+        selectionButtons.forEach((b) => b.classList.remove("selected"));
         if (radio.checked) {
-          button.classList.add('selected');
+          button.classList.add("selected");
         }
       });
     });
@@ -72,7 +111,9 @@ function createCommentWindow() {
 
     saveBtn.addEventListener("click", () => {
       const comment = textarea.value;
-      const selectedUseful = Array.from(radios).find(radio => radio.checked)?.value;
+      const selectedUseful = Array.from(radios).find(
+        (radio) => radio.checked
+      )?.value;
       if (comment && selectedUseful) {
         saveComment(comment, selectedUseful);
         commentWindow.remove();
@@ -89,6 +130,14 @@ function createCommentWindow() {
         }
       });
     }
+
+    // テキストエリアにフォーカスを当てる
+    // フォーカスが確実に当たるように、setTimeout を使用
+    setTimeout(() => {
+      textarea.focus();
+      // カーソルを末尾に移動
+      textarea.selectionStart = textarea.selectionEnd = textarea.value.length;
+    }, 0);
   });
 }
 
@@ -97,9 +146,9 @@ function saveComment(comment, useful) {
   const url = new URL(window.location.href).toString();
   chrome.storage.local.get(["pageNotes"], (result) => {
     const notes = result.pageNotes || {};
-    notes[url] = { 
-      text: comment, 
-      useful: useful 
+    notes[url] = {
+      text: comment,
+      useful: useful,
     };
     chrome.storage.local.set({ pageNotes: notes }, () => {
       updateLinkStyles();
@@ -112,20 +161,21 @@ function updateLinkStyles() {
   chrome.storage.local.get(["pageNotes"], (result) => {
     const notes = result.pageNotes || {};
     const links = document.querySelectorAll("a:has(h3)");
-    
-    links.forEach(link => {
+
+    links.forEach((link) => {
       // href属性がない場合はスキップ
       if (!link.href) return;
-      
+
       // 完全なURLを取得
       const url = new URL(link.href).toString();
       const noteData = notes[url];
-      
+
       // 既存のスタイルをリセット
       link.classList.remove("useful-yes", "useful-no");
-      
+
       if (noteData && noteData.useful) {
-        const className = noteData.useful === "yes" ? "useful-yes" : "useful-no";
+        const className =
+          noteData.useful === "yes" ? "useful-yes" : "useful-no";
         link.classList.add(className);
       }
     });
@@ -190,8 +240,9 @@ function showTooltip(element, noteData) {
   try {
     const tooltip = document.createElement("div");
     tooltip.className = "page-notes-tooltip";
-    
-    const usefulStatus = noteData.useful === "yes" ? "〇 役立つ" : "× 役立たない";
+
+    const usefulStatus =
+      noteData.useful === "yes" ? "〇 役立つ" : "× 役立たない";
     tooltip.innerHTML = `
       <div class="tooltip-status ${noteData.useful}">${usefulStatus}</div>
       <div class="tooltip-text">${noteData.text}</div>
@@ -276,4 +327,73 @@ if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", initialize);
 } else {
   initialize();
+}
+
+// ドラッグ機能の初期化
+function initDraggable() {
+  const header = commentWindow.querySelector(".page-notes-header");
+  header.style.cursor = "move";
+
+  header.addEventListener("mousedown", dragStart);
+  document.addEventListener("mousemove", drag);
+  document.addEventListener("mouseup", dragEnd);
+}
+
+// ドラッグイベントのクリーンアップ
+function cleanupDraggable() {
+  document.removeEventListener("mousemove", drag);
+  document.removeEventListener("mouseup", dragEnd);
+  isDragging = false;
+}
+
+function dragStart(e) {
+  if (!commentWindow) return; // nullチェックを追加
+
+  const windowRect = commentWindow.getBoundingClientRect();
+  initialX = e.clientX - windowRect.left;
+  initialY = e.clientY - windowRect.top;
+
+  if (
+    e.target.closest(".page-notes-header") &&
+    !e.target.closest(".page-notes-close")
+  ) {
+    isDragging = true;
+    commentWindow.classList.add("dragging");
+  }
+}
+
+function drag(e) {
+  if (!isDragging || !commentWindow) return; // nullチェックを追加
+  e.preventDefault();
+
+  const newX = e.clientX - initialX;
+  const newY = e.clientY - initialY;
+
+  // ウィンドウが画面外に出ないように制限
+  const windowWidth = window.innerWidth;
+  const windowHeight = window.innerHeight;
+  const boxWidth = commentWindow.offsetWidth;
+  const boxHeight = commentWindow.offsetHeight;
+
+  const x = Math.min(Math.max(0, newX), windowWidth - boxWidth);
+  const y = Math.min(Math.max(0, newY), windowHeight - boxHeight);
+
+  setTranslate(x, y);
+}
+
+function dragEnd() {
+  if (!commentWindow) return; // nullチェックを追加
+
+  initialX = currentX;
+  initialY = currentY;
+  isDragging = false;
+  commentWindow.classList.remove("dragging");
+}
+
+function setTranslate(x, y) {
+  if (!commentWindow) return; // nullチェックを追加
+
+  currentX = x;
+  currentY = y;
+  commentWindow.style.transform = `translate(${x}px, ${y}px)`;
 }
