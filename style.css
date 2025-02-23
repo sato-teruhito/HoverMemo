@@ -1,55 +1,198 @@
+/* メインウィンドウのスタイル */
 .page-notes-window {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 300px;
-    background: white;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    z-index: 10000;
-  }
-  
-  .page-notes-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px;
-    border-bottom: 1px solid #eee;
-  }
-  
-  .page-notes-close {
-    border: none;
-    background: none;
-    cursor: pointer;
-    font-size: 18px;
-  }
-  
-  .page-notes-textarea {
-    width: 100%;
-    height: 150px;
-    padding: 8px;
-    border: none;
-    resize: none;
-  }
-  
-  .page-notes-save {
-    width: 100%;
-    padding: 8px;
-    background: #4CAF50;
-    color: white;
-    border: none;
-    cursor: pointer;
-  }
-  
-  .page-notes-tooltip {
-    position: absolute;
-    background: rgba(0, 0, 0, 0.8);
-    color: white;
-    padding: 8px;
-    border-radius: 4px;
-    max-width: 300px;
-    z-index: 10000;
-  }
-  
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 320px;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 10000;
+  box-sizing: border-box;
+}
+
+/* ドラッグ中のスタイル */
+.page-notes-window.dragging {
+  opacity: 0.9;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  transition: box-shadow 0.3s ease;
+}
+
+/* ヘッダー */
+.page-notes-header,
+.side-menu-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+  background: #f1f1f1;
+  user-select: none;
+}
+
+/* ボタン共通スタイル */
+.page-notes-close,
+.page-notes-menu,
+.side-menu-close {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+/* テキストエリア */
+.page-notes-textarea {
+  width: 100%;
+  height: 150px;
+  padding: 12px;
+  border: none;
+  resize: none;
+  box-sizing: border-box;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* 有用性選択部分 */
+.page-notes-selection {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  padding: 10px;
+  border-top: 1px solid #eee;
+}
+
+.selection-button {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  padding: 8px 15px;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+}
+
+.selection-button input[type="radio"] {
+  display: none;
+}
+
+.selection-button.yes {
+  border: 2px solid #4caf50;
+  color: #4caf50;
+}
+
+.selection-button.no {
+  border: 2px solid #f44336;
+  color: #f44336;
+}
+
+.selection-button.yes.selected {
+  background-color: #4caf50;
+  color: white;
+}
+
+.selection-button.no.selected {
+  background-color: #f44336;
+  color: white;
+}
+
+.selection-icon {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+/* ボタン領域 */
+.page-notes-buttons {
+  display: flex;
+  gap: 8px;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+/* 保存ボタン */
+.page-notes-save {
+  flex: 1;
+  padding: 8px;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.page-notes-create {
+  background: #4caf50;
+}
+
+.page-notes-update {
+  background: #2196f3;
+}
+
+/* 削除ボタン */
+.page-notes-delete {
+  flex: 1;
+  padding: 8px;
+  background: #f44336;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+/* ツールチップ */
+.page-notes-tooltip {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 8px;
+  border-radius: 4px;
+  max-width: 300px;
+  z-index: 10000;
+}
+
+.tooltip-status {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.tooltip-status.yes {
+  color: #4caf50;
+}
+
+.tooltip-status.no {
+  color: #f44336;
+}
+
+.tooltip-text {
+  margin-top: 5px;
+  white-space: pre-wrap;
+}
+
+/* サイドメニュー */
+.side-menu-window {
+  position: fixed;
+  top: 50%;
+  right: 20px;
+  width: 250px;
+  background: white;
+  border: 1px solid #ccc;
+  padding: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  transform: translateY(-50%);
+  z-index: 10000;
+}
+
+/* リンクスタイル */
+.useful-yes {
+  border-bottom: 2px solid #4caf50 !important;
+  text-decoration: none !important;
+}
+
+.useful-no {
+  border-bottom: 2px solid #f44336 !important;
+  text-decoration: none !important;
+}
+
+.useful-yes:hover,
+.useful-no:hover {
+  text-decoration: none !important;
+}

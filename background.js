@@ -1,7 +1,50 @@
-chrome.commands.onCommand.addListener((command) => {
-    if (command === "open-comment") {
-      chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
-        chrome.tabs.sendMessage(tabs[0].id, {action: "openCommentWindow"});
+// 接続が確立されているタブのIDを追跡
+let connectedTabs = new Set();
+
+// タブが更新された時の処理
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (changeInfo.status === "complete") {
+    connectedTabs.add(tabId);
+  }
+});
+
+// タブが閉じられた時の処理
+chrome.tabs.onRemoved.addListener((tabId) => {
+  connectedTabs.delete(tabId);
+});
+
+// コマンドリスナー
+chrome.commands.onCommand.addListener(async (command) => {
+  if (command === "open-comment") {
+    try {
+      const [tab] = await chrome.tabs.query({
+        active: true,
+        currentWindow: true,
       });
+
+      if (!tab) {
+        console.error("No active tab found");
+        return;
+      }
+
+      // タブが接続可能か確認
+      if (!connectedTabs.has(tab.id)) {
+        console.error("Tab not ready for connection");
+        return;
+      }
+
+      // メッセージ送信を試みる
+      try {
+        await chrome.tabs.sendMessage(tab.id, { action: "openCommentWindow" });
+      } catch (error) {
+        console.error("Failed to send message:", error);
+        // エラーが発生した場合、タブをリロード
+        if (error.message.includes("Receiving end does not exist")) {
+          chrome.tabs.reload(tab.id);
+        }
+      }
+    } catch (error) {
+      console.error("Error in command handler:", error);
     }
-  });
+  }
+});
