@@ -154,6 +154,10 @@ function createSideMenuWindow() {
       <span>保存されたメモ一覧</span>
       <button class="side-menu-close">×</button>
     </div>
+    <div class="side-menu-filters">
+      <label><input type="checkbox" id="filterYes" checked> 役立つ</label>
+      <label><input type="checkbox" id="filterNo" checked> 役立たない</label>
+    </div>
     <div class="side-menu-content">
       <ul id="notesList"></ul>
     </div>
@@ -167,10 +171,14 @@ function createSideMenuWindow() {
     sideMenuWindow = null;
   });
 
+  // チェックボックス変更時のイベント
+  document.getElementById("filterYes").addEventListener("change", updateNotesList);
+  document.getElementById("filterNo").addEventListener("change", updateNotesList);
+
   updateNotesList();
 }
 
-// メモ一覧を更新する関数
+// メモ一覧を更新する関数 
 function updateNotesList() {
   if (!sideMenuWindow) return;
 
@@ -178,6 +186,10 @@ function updateNotesList() {
     const notes = result.pageNotes || {};
     const notesList = sideMenuWindow.querySelector("#notesList");
     notesList.innerHTML = "";
+
+    // チェックボックスの状態を取得
+    const showYes = document.getElementById("filterYes").checked;
+    const showNo = document.getElementById("filterNo").checked;
 
     for (const [url, data] of Object.entries(notes)) {
       const noteData =
@@ -189,6 +201,11 @@ function updateNotesList() {
               useful: "",
             }
           : data;
+
+      // フィルタリング処理
+      if (!showYes && noteData.useful === "yes") continue;
+      if (!showNo && noteData.useful === "no") continue;
+      if (!showYes && !showNo) continue; // どちらもオフなら何も表示しない
 
       const listItem = document.createElement("li");
       listItem.style.marginBottom = "10px";
@@ -210,9 +227,7 @@ function updateNotesList() {
       useful.textContent =
         noteData.useful === "yes"
           ? "〇 役立つ"
-          : noteData.useful === "no"
-          ? "× 役立たない"
-          : "";
+          : "× 役立たない";
       useful.style.display = "block";
 
       const comment = document.createElement("span");

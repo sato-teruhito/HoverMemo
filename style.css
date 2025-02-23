@@ -196,3 +196,15 @@
 .useful-no:hover {
   text-decoration: none !important;
 }
+.side-menu-filters {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+}
+
+.side-menu-filters label {
+  cursor: pointer;
+  font-size: 14px;
+}
