@@ -8,23 +8,60 @@
       margin: 0;
       padding: 16px;
       font-family: sans-serif;
-      overflow-x: hidden; /* 横スクロールを防ぐ */
+      overflow-x: hidden;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .header h2 {
+      margin: 0;
     }
     .filter-section {
-      margin-bottom: 16px;
-      padding: 8px;
-      background: #f8f9fa;
-      border-radius: 4px;
-      max-width: 100%;
-      box-sizing: border-box;
+      position: relative;
     }
     .filter-title {
       font-weight: bold;
-      margin-bottom: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      user-select: none;
+      padding: 8px;
+      background: #f8f9fa;
+      border-radius: 4px;
+    }
+    .filter-title::after {
+      content: "▼";
+      font-size: 0.8em;
+      margin-left: 8px;
+      transition: transform 0.2s;
+    }
+    .filter-title.open::after {
+      transform: rotate(180deg);
+    }
+    .dropdown-content {
+      display: none;
+      padding: 8px;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      position: absolute;
+      right: 0;
+      top: 100%;
+      margin-top: 4px;
+      min-width: 120px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      z-index: 1000;
+    }
+    .dropdown-content.show {
+      display: block;
     }
     .checkbox-group {
       display: flex;
-      gap: 16px;
+      flex-direction: column;
+      gap: 8px;
     }
     .checkbox-wrapper {
       display: flex;
@@ -44,7 +81,6 @@
       display: block;
       margin-bottom: 8px;
     }
-    /* 情報行のスタイルを更新 */
     .note-info-row {
       display: flex;
       align-items: center;
@@ -88,18 +124,22 @@
   </style>
 </head>
 <body>
-  <h2>メモ一覧</h2>  
-  <div class="filter-section">
-    <div class="filter-title">フィルター</div>
-    <div class="checkbox-group">
-      <label class="checkbox-wrapper">
-        <input type="checkbox" id="filterUsefulYes" checked>
-        必要
-      </label>
-      <label class="checkbox-wrapper">
-        <input type="checkbox" id="filterUsefulNo" checked>
-        不要
-      </label>
+  <div class="header">
+    <h2>メモ一覧</h2>
+    <div class="filter-section">
+      <div class="filter-title">フィルター</div>
+      <div class="dropdown-content">
+        <div class="checkbox-group">
+          <label class="checkbox-wrapper">
+            <input type="checkbox" id="filterUsefulYes" checked>
+            必要
+          </label>
+          <label class="checkbox-wrapper">
+            <input type="checkbox" id="filterUsefulNo" checked>
+            不要
+          </label>
+        </div>
+      </div>
     </div>
   </div>
   <div id="notesList"></div>
