@@ -1,14 +1,17 @@
 {
   "manifest_version": 3,
-  "name": "PUMP -Popup Memo Pad-",
-  "version": "1.0",
+  "name": "PUMP -Pop Up Memo Pad-",
+  "version": "2.0",
   "description": "ウェブページにコメントを追加・表示できる拡張機能",
-  "permissions": ["storage", "activeTab"],
+  "permissions": ["storage", "activeTab", "sidePanel"],
   "action": {
     "default_title": "PUMP"
   },
   "background": {
     "service_worker": "background.js"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
   },
   "content_scripts": [
     {

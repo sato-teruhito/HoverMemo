@@ -29,7 +29,7 @@ function createCommentWindow() {
     commentWindow.className = "page-notes-window";
     commentWindow.innerHTML = `
       <div class="page-notes-header">
-        <span>メモを残そう！</span>
+        <span>PopUpMemoPad</span>
         <div class="header-buttons">
           <button class="page-notes-menu">メモ一覧</button>
           <button class="page-notes-close">×</button>
@@ -43,7 +43,7 @@ function createCommentWindow() {
           <input type="radio" name="useful" value="yes" ${
             existingUseful === "yes" ? "checked" : ""
           }>
-          <span class="selection-icon">〇</span> 役立つ
+          <span class="selection-icon">〇</span> 必要
         </label>
         <label class="selection-button no ${
           existingUseful === "no" ? "selected" : ""
@@ -51,7 +51,7 @@ function createCommentWindow() {
           <input type="radio" name="useful" value="no" ${
             existingUseful === "no" ? "checked" : ""
           }>
-          <span class="selection-icon">×</span> 役立たない
+          <span class="selection-icon">×</span> 不要
         </label>
       </div>
       <div class="page-notes-buttons">
@@ -89,13 +89,15 @@ function createCommentWindow() {
     const radios = commentWindow.querySelectorAll("input[name='useful']");
     const selectionButtons =
       commentWindow.querySelectorAll(".selection-button");
+    //const openMenuBtn = commentWindow.querySelector(".page-notes-menu");
     const openMenuBtn = commentWindow.querySelector(".page-notes-menu");
 
     // ドラッグ機能の初期化
     initDraggable();
 
     openMenuBtn.addEventListener("click", () => {
-      createSideMenuWindow();
+      //createSideMenuWindow();
+      chrome.runtime.sendMessage({ action: "openSidePanel" });
     });
 
     closeBtn.addEventListener("click", () => {
@@ -146,7 +148,7 @@ function createCommentWindow() {
 }
 
 // サイドメニューウィンドウを作成
-function createSideMenuWindow() {
+/*function createSideMenuWindow() {
   if (sideMenuWindow) return;
 
   sideMenuWindow = document.createElement("div");
@@ -170,10 +172,10 @@ function createSideMenuWindow() {
   });
 
   updateNotesList();
-}
+}*/
 
 // メモ一覧を更新する関数
-function updateNotesList() {
+/*function updateNotesList() {
   if (!sideMenuWindow) return;
 
   chrome.storage.local.get(["pageNotes"], (result) => {
@@ -246,7 +248,7 @@ function updateNotesList() {
       notesList.appendChild(listItem);
     }
   });
-}
+} */
 
 // コメントを保存
 function saveComment(comment, useful) {
@@ -260,7 +262,7 @@ function saveComment(comment, useful) {
 
     chrome.storage.local.set({ pageNotes: notes }, () => {
       updateLinkStyles();
-      updateNotesList();
+      //updateNotesList();
     });
   });
 }
@@ -275,7 +277,7 @@ function deleteComment(specificUrl) {
 
     chrome.storage.local.set({ pageNotes: notes }, () => {
       updateLinkStyles();
-      updateNotesList();
+      //updateNotesList();
     });
   });
 }
@@ -304,9 +306,8 @@ function updateLinkStyles() {
 }
 
 window.addEventListener("pageshow", () => {
-  console.log("おけ");
   updateLinkStyles();
-})
+});
 
 // ツールチップ関連の関数
 function showTooltip(element, noteData) {
@@ -323,7 +324,7 @@ function showTooltip(element, noteData) {
     // usefulプロパティが存在する場合は、ステータスも表示
     if (noteData.useful) {
       const usefulStatus =
-        noteData.useful === "yes" ? "〇 役立つ" : "× 役立たない";
+        noteData.useful === "yes" ? "〇 必要" : "× 不要";
       tooltipContent = `
         <div class="tooltip-status ${noteData.useful}">${usefulStatus}</div>
         ${tooltipContent}
