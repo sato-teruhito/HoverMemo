@@ -304,6 +304,7 @@ function updateLinkStyles() {
 }
 
 window.addEventListener("pageshow", () => {
+  console.log("おけ");
   updateLinkStyles();
 })
 
