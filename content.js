@@ -30,7 +30,7 @@ function createCommentWindow() {
     commentWindow.innerHTML = `
       <div class="page-notes-header">
         <span>メモを残そう！</span>
-        <<div class="header-buttons">
+        <div class="header-buttons">
           <button class="page-notes-menu">メモ一覧</button>
           <button class="page-notes-close">×</button>
         </div>
@@ -307,7 +307,7 @@ function updateLinkStyles() {
 
 window.addEventListener("pageshow", () => {
   updateLinkStyles();
-})
+});
 
 // ツールチップ関連の関数
 function showTooltip(element, noteData) {

@@ -51,11 +51,11 @@ chrome.commands.onCommand.addListener(async (command) => {
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "openSidePanel") {
-  // 現在のウィンドウIDを取得してサイドパネルを開く
-    chrome.windows.getCurrent(currentWindow => {
+    // 現在のウィンドウIDを取得してサイドパネルを開く
+    chrome.windows.getCurrent((currentWindow) => {
       chrome.sidePanel.open({ windowId: currentWindow.id });
     });
-  } 
+  }
 });
 
 chrome.action.onClicked.addListener((tab) => {
