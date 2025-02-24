@@ -304,7 +304,6 @@ function updateLinkStyles() {
 }
 
 window.addEventListener("pageshow", () => {
-  console.log("Search results page");
   updateLinkStyles();
 })
 
