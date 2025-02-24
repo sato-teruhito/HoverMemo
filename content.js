@@ -303,6 +303,11 @@ function updateLinkStyles() {
   });
 }
 
+window.addEventListener("pageshow", () => {
+  console.log("Search results page");
+  updateLinkStyles();
+})
+
 // ツールチップ関連の関数
 function showTooltip(element, noteData) {
   try {
