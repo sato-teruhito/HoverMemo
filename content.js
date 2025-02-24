@@ -305,6 +305,10 @@ function updateLinkStyles() {
   });
 }
 
+window.addEventListener("pageshow", () => {
+  updateLinkStyles();
+})
+
 // ツールチップ関連の関数
 function showTooltip(element, noteData) {
   try {
