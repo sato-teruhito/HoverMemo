@@ -52,7 +52,7 @@ function updateNotesList() {
 
       const useful = document.createElement("div");
       useful.className = `note-useful ${noteData.useful === "yes" ? "useful-yes" : "useful-no"}`;
-      useful.textContent = noteData.useful === "yes" ? "〇 役立つ" : "× 役立たない";
+      useful.textContent = noteData.useful === "yes" ? "〇 必要" : "× 不要";
 
       const deleteBtn = document.createElement("button");
       deleteBtn.className = "delete-btn";
