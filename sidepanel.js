@@ -4,6 +4,15 @@ let filters = {
   showUsefulNo: true
 };
 
+// ドロップダウンの制御
+const filterTitle = document.querySelector('.filter-title');
+const dropdownContent = document.querySelector('.dropdown-content');
+
+filterTitle.addEventListener('click', () => {
+  filterTitle.classList.toggle('open');
+  dropdownContent.classList.toggle('show');
+});
+
 // フィルターのイベントリスナー
 document.getElementById('filterUsefulYes').addEventListener('change', (e) => {
   filters.showUsefulYes = e.target.checked;
@@ -42,7 +51,6 @@ function updateNotesList() {
         chrome.tabs.create({ url: url });
       });
 
-      // 情報行のコンテナを作成
       const infoRow = document.createElement("div");
       infoRow.className = "note-info-row";
 
@@ -58,31 +66,28 @@ function updateNotesList() {
       deleteBtn.className = "delete-btn";
       deleteBtn.textContent = "🗑 削除";
       deleteBtn.addEventListener("click", () => {
-          if (confirm(`「${noteData.title}」のメモを削除しますか？`)) {
+        if (confirm(`「${noteData.title}」のメモを削除しますか？`)) {
           delete notes[url];
           chrome.storage.local.set({ pageNotes: notes }, () => {
-              updateNotesList();
+            updateNotesList();
           });
-          }
+        }
       });
 
-      //コメント部分
       const comment = document.createElement("div");
       comment.className = "note-comment";
       comment.textContent = noteData.comment || "（メモなし）";
 
-      // 情報行に要素を追加
       infoRow.appendChild(date);
       infoRow.appendChild(useful);
       infoRow.appendChild(deleteBtn);
 
-      // noteItemに要素を追加
       noteItem.appendChild(title);
       noteItem.appendChild(infoRow);
       noteItem.appendChild(comment);
 
       notesList.appendChild(noteItem);
-      }
+    }
   });
 }
 
@@ -93,5 +98,14 @@ updateNotesList();
 chrome.storage.onChanged.addListener((changes) => {
   if (changes.pageNotes) {
     updateNotesList();
+  }
+});
+
+// ドロップダウン以外の場所をクリックした時にドロップダウンを閉じる
+document.addEventListener('click', (e) => {
+  const filterSection = document.querySelector('.filter-section');
+  if (!filterSection.contains(e.target)) {
+    filterTitle.classList.remove('open');
+    dropdownContent.classList.remove('show');
   }
 });
