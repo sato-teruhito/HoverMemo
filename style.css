@@ -60,26 +60,6 @@
   font-size: 18px;
 }
 
-/*メモ一覧ボタン追加にあたり変更しました*/
-.page-notes-menu {
-  margin-right: 8px; /* ✖ボタンとの間隔 */
-  padding: 4px 8px;
-  border-radius: 4px;
-  background: #f5f5f5;
-  border: 1px solid #ddd;
-  font-size: 14px;
-  order: 1; /* 順序を指定 */
-}
-
-.page-notes-menu:hover {
-  background: #e5e5e5;
-}
-
-.page-notes-close {
-  font-size: 18px;
-  order: 2; /* 順序を指定 */
-}
-
 /* テキストエリア */
 .page-notes-textarea {
   width: 100%;
@@ -226,22 +206,6 @@
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
   transform: translateY(-50%);
   z-index: 10000;
-}
-
-/* サイドメニューのコンテンツスタイル固定 */
-.side-menu-content {
-  font-size: 14px;
-}
-
-.side-menu-content ul {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.side-menu-content li {
-  font-size: 14px;
-  line-height: 1.5;
 }
 
 /* リンクスタイル */

@@ -30,7 +30,7 @@ function createCommentWindow() {
     commentWindow.innerHTML = `
       <div class="page-notes-header">
         <span>メモを残そう！</span>
-        <div class="header-buttons">
+        <<div class="header-buttons">
           <button class="page-notes-menu">メモ一覧</button>
           <button class="page-notes-close">×</button>
         </div>
@@ -89,13 +89,15 @@ function createCommentWindow() {
     const radios = commentWindow.querySelectorAll("input[name='useful']");
     const selectionButtons =
       commentWindow.querySelectorAll(".selection-button");
+    //const openMenuBtn = commentWindow.querySelector(".page-notes-menu");
     const openMenuBtn = commentWindow.querySelector(".page-notes-menu");
 
     // ドラッグ機能の初期化
     initDraggable();
 
     openMenuBtn.addEventListener("click", () => {
-      createSideMenuWindow();
+      //createSideMenuWindow();
+      chrome.runtime.sendMessage({ action: "openSidePanel" });
     });
 
     closeBtn.addEventListener("click", () => {
@@ -146,7 +148,7 @@ function createCommentWindow() {
 }
 
 // サイドメニューウィンドウを作成
-function createSideMenuWindow() {
+/*function createSideMenuWindow() {
   if (sideMenuWindow) return;
 
   sideMenuWindow = document.createElement("div");
@@ -170,10 +172,10 @@ function createSideMenuWindow() {
   });
 
   updateNotesList();
-}
+}*/
 
 // メモ一覧を更新する関数
-function updateNotesList() {
+/*function updateNotesList() {
   if (!sideMenuWindow) return;
 
   chrome.storage.local.get(["pageNotes"], (result) => {
@@ -246,7 +248,7 @@ function updateNotesList() {
       notesList.appendChild(listItem);
     }
   });
-}
+} */
 
 // コメントを保存
 function saveComment(comment, useful) {
@@ -260,7 +262,7 @@ function saveComment(comment, useful) {
 
     chrome.storage.local.set({ pageNotes: notes }, () => {
       updateLinkStyles();
-      updateNotesList();
+      //updateNotesList();
     });
   });
 }
@@ -275,7 +277,7 @@ function deleteComment(specificUrl) {
 
     chrome.storage.local.set({ pageNotes: notes }, () => {
       updateLinkStyles();
-      updateNotesList();
+      //updateNotesList();
     });
   });
 }
@@ -302,6 +304,10 @@ function updateLinkStyles() {
     });
   });
 }
+
+window.addEventListener("pageshow", () => {
+  updateLinkStyles();
+});
 
 // ツールチップ関連の関数
 function showTooltip(element, noteData) {
