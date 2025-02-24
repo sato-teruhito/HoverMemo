@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body {
+      width: 100%;
+      margin: 0;
+      padding: 16px;
+      font-family: sans-serif;
+      overflow-x: hidden; /* 横スクロールを防ぐ */
+    }
+    .filter-section {
+      margin-bottom: 16px;
+      padding: 8px;
+      background: #f8f9fa;
+      border-radius: 4px;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+    .filter-title {
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+    .checkbox-group {
+      display: flex;
+      gap: 16px;
+    }
+    .checkbox-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .note-item {
+      border-bottom: 1px solid #eee;
+      padding: 12px 0;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+    .note-title {
+      color: #1a73e8;
+      text-decoration: none;
+      font-weight: bold;
+      display: block;
+      margin-bottom: 8px;
+    }
+    /* 情報行のスタイルを更新 */
+    .note-info-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+    .note-date {
+      color: #666;
+      font-size: 0.9em;
+      white-space: nowrap;
+    }
+    .note-useful {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.9em;
+      white-space: nowrap;
+    }
+    .useful-yes {
+      background: #e6f4ea;
+      color: #137333;
+    }
+    .useful-no {
+      background: #fce8e6;
+      color: #c5221f;
+    }
+    .note-comment {
+      color: #202124;
+      margin-bottom: 8px;
+    }
+    .delete-btn {
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9em;
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+  <h2>保存されたメモ一覧</h2>  
+  <div class="filter-section">
+    <div class="filter-title">フィルター</div>
+    <div class="checkbox-group">
+      <label class="checkbox-wrapper">
+        <input type="checkbox" id="filterUsefulYes" checked>
+        役立つ
+      </label>
+      <label class="checkbox-wrapper">
+        <input type="checkbox" id="filterUsefulNo" checked>
+        役立たない
+      </label>
+    </div>
+  </div>
+  <div id="notesList"></div>
+  <script src="sidepanel.js"></script>
+</body>
+</html>
