@@ -10,21 +10,27 @@
       font-family: sans-serif;
       overflow-x: hidden;
     }
-    .filter-section {
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       margin-bottom: 16px;
-      padding: 8px;
-      background: #f8f9fa;
-      border-radius: 4px;
-      max-width: 100%;
-      box-sizing: border-box;
+    }
+    .header h2 {
+      margin: 0;
+    }
+    .filter-section {
+      position: relative;
     }
     .filter-title {
       font-weight: bold;
-      margin-bottom: 8px;
       cursor: pointer;
       display: flex;
       align-items: center;
       user-select: none;
+      padding: 8px;
+      background: #f8f9fa;
+      border-radius: 4px;
     }
     .filter-title::after {
       content: "▼";
@@ -41,7 +47,13 @@
       background: white;
       border: 1px solid #ddd;
       border-radius: 4px;
-      margin-top: 8px;
+      position: absolute;
+      right: 0;
+      top: 100%;
+      margin-top: 4px;
+      min-width: 120px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      z-index: 1000;
     }
     .dropdown-content.show {
       display: block;
@@ -112,19 +124,21 @@
   </style>
 </head>
 <body>
-  <h2>メモ一覧</h2>  
-  <div class="filter-section">
-    <div class="filter-title">フィルター</div>
-    <div class="dropdown-content">
-      <div class="checkbox-group">
-        <label class="checkbox-wrapper">
-          <input type="checkbox" id="filterUsefulYes" checked>
-          必要
-        </label>
-        <label class="checkbox-wrapper">
-          <input type="checkbox" id="filterUsefulNo" checked>
-          不要
-        </label>
+  <div class="header">
+    <h2>メモ一覧</h2>
+    <div class="filter-section">
+      <div class="filter-title">フィルター</div>
+      <div class="dropdown-content">
+        <div class="checkbox-group">
+          <label class="checkbox-wrapper">
+            <input type="checkbox" id="filterUsefulYes" checked>
+            必要
+          </label>
+          <label class="checkbox-wrapper">
+            <input type="checkbox" id="filterUsefulNo" checked>
+            不要
+          </label>
+        </div>
       </div>
     </div>
   </div>
