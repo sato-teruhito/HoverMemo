@@ -29,9 +29,11 @@ function createCommentWindow() {
     commentWindow.className = "page-notes-window";
     commentWindow.innerHTML = `
       <div class="page-notes-header">
-        <span>メモを残そう！</span>
-        <button class="page-notes-menu">☰</button>
-        <button class="page-notes-close">×</button>
+        <span>PopUpMemoPad</span>
+        <div class="header-buttons">
+          <button class="page-notes-menu">メモ一覧</button>
+          <button class="page-notes-close">×</button>
+        </div>
       </div>
       <textarea class="page-notes-textarea">${existingComment}</textarea>
       <div class="page-notes-selection">
@@ -41,7 +43,7 @@ function createCommentWindow() {
           <input type="radio" name="useful" value="yes" ${
             existingUseful === "yes" ? "checked" : ""
           }>
-          <span class="selection-icon">〇</span> 役立つ
+          <span class="selection-icon">〇</span> 必要
         </label>
         <label class="selection-button no ${
           existingUseful === "no" ? "selected" : ""
@@ -49,7 +51,7 @@ function createCommentWindow() {
           <input type="radio" name="useful" value="no" ${
             existingUseful === "no" ? "checked" : ""
           }>
-          <span class="selection-icon">×</span> 役立たない
+          <span class="selection-icon">×</span> 不要
         </label>
       </div>
       <div class="page-notes-buttons">
@@ -303,6 +305,10 @@ function updateLinkStyles() {
   });
 }
 
+window.addEventListener("pageshow", () => {
+  updateLinkStyles();
+});
+
 // ツールチップ関連の関数
 function showTooltip(element, noteData) {
   try {
@@ -318,7 +324,7 @@ function showTooltip(element, noteData) {
     // usefulプロパティが存在する場合は、ステータスも表示
     if (noteData.useful) {
       const usefulStatus =
-        noteData.useful === "yes" ? "〇 役立つ" : "× 役立たない";
+        noteData.useful === "yes" ? "〇 必要" : "× 不要";
       tooltipContent = `
         <div class="tooltip-status ${noteData.useful}">${usefulStatus}</div>
         ${tooltipContent}
