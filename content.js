@@ -442,3 +442,17 @@ if (document.readyState === "loading") {
 } else {
   initialize();
 }
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === "updateLinkStyles") {
+    try {
+      updateLinkStyles();
+      setupSearchResultsHover();
+      if (sendResponse) sendResponse({ success: true });
+    } catch (error) {
+      console.error("Error updating link styles:", error);
+      if (sendResponse) sendResponse({ success: false, error: error.message });
+    }
+  }
+  return true;  // 非同期レスポンスのために true を返す
+});
