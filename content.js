@@ -343,17 +343,7 @@ function setTranslate(x, y) {
 
 // 検索結果ページでのホバー表示処理
 function setupSearchResultsHover() {
-  let links = [];
-
-  if (location.hostname.includes("google.com")) {
-    // Google 通常検索
-    links = Array.from(document.querySelectorAll("a:has(h3)"));
-  }
-
-  if (location.hostname.includes("scholar.google.co.jp")) {
-    // Google Scholar
-    links = Array.from(document.querySelectorAll("h3.gs_rt a"));
-  }
+  const links = getSearchResultLinks();
 
   links.forEach((link) => {
     if (!link.href) return;
