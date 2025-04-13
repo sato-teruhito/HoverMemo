@@ -82,6 +82,13 @@ function updateNotesList() {
           delete notes[noteData.url];
           chrome.storage.local.set({ pageNotes: notes }, () => {
             updateNotesList();
+
+            chrome.tabs.query({}, (tabs) => {
+              tabs.forEach(tab => {
+                chrome.tabs.sendMessage(tab.id, { action: "updateLinkStyles" })
+                  .catch(err => console.log(`Could not send message to tab ${tab.id}: ${err.message}`));
+              });
+            });
           });
         }
       });
