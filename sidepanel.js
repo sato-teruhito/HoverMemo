@@ -1,25 +1,25 @@
 // フィルター状態
 let filters = {
   showUsefulYes: true,
-  showUsefulNo: true
+  showUsefulNo: true,
 };
 
 // ドロップダウンの制御
-const filterTitle = document.querySelector('.filter-title');
-const dropdownContent = document.querySelector('.dropdown-content');
+const filterTitle = document.querySelector(".filter-title");
+const dropdownContent = document.querySelector(".dropdown-content");
 
-filterTitle.addEventListener('click', () => {
-  filterTitle.classList.toggle('open');
-  dropdownContent.classList.toggle('show');
+filterTitle.addEventListener("click", () => {
+  filterTitle.classList.toggle("open");
+  dropdownContent.classList.toggle("show");
 });
 
 // フィルターのイベントリスナー
-document.getElementById('filterUsefulYes').addEventListener('change', (e) => {
+document.getElementById("filterUsefulYes").addEventListener("change", (e) => {
   filters.showUsefulYes = e.target.checked;
   updateNotesList();
 });
 
-document.getElementById('filterUsefulNo').addEventListener('change', (e) => {
+document.getElementById("filterUsefulNo").addEventListener("change", (e) => {
   filters.showUsefulNo = e.target.checked;
   updateNotesList();
 });
@@ -33,9 +33,15 @@ function updateNotesList() {
     // エントリーを配列に変換して日付でソート
     const sortedNotes = Object.entries(notes)
       .map(([url, data]) => {
-        const noteData = typeof data === "string"
-          ? { title: "不明なページ", comment: data, date: "不明な日付", useful: "" }
-          : data;
+        const noteData =
+          typeof data === "string"
+            ? {
+                title: "不明なページ",
+                comment: data,
+                date: "不明な日付",
+                useful: "",
+              }
+            : data;
         return { url, ...noteData };
       })
       .sort((a, b) => {
@@ -71,7 +77,9 @@ function updateNotesList() {
       date.textContent = `📅 ${noteData.date}`;
 
       const useful = document.createElement("div");
-      useful.className = `note-useful ${noteData.useful === "yes" ? "useful-yes" : "useful-no"}`;
+      useful.className = `note-useful ${
+        noteData.useful === "yes" ? "useful-yes" : "useful-no"
+      }`;
       useful.textContent = noteData.useful === "yes" ? "〇 必要" : "× 不要";
 
       const deleteBtn = document.createElement("button");
@@ -84,9 +92,14 @@ function updateNotesList() {
             updateNotesList();
 
             chrome.tabs.query({}, (tabs) => {
-              tabs.forEach(tab => {
-                chrome.tabs.sendMessage(tab.id, { action: "updateLinkStyles" })
-                  .catch(err => console.log(`Could not send message to tab ${tab.id}: ${err.message}`));
+              tabs.forEach((tab) => {
+                chrome.tabs
+                  .sendMessage(tab.id, { action: "updateLinkStyles" })
+                  .catch((err) =>
+                    console.log(
+                      `Could not send message to tab ${tab.id}: ${err.message}`
+                    )
+                  );
               });
             });
           });
@@ -121,10 +134,10 @@ chrome.storage.onChanged.addListener((changes) => {
 });
 
 // ドロップダウン以外の場所をクリックした時にドロップダウンを閉じる
-document.addEventListener('click', (e) => {
-  const filterSection = document.querySelector('.filter-section');
+document.addEventListener("click", (e) => {
+  const filterSection = document.querySelector(".filter-section");
   if (!filterSection.contains(e.target)) {
-    filterTitle.classList.remove('open');
-    dropdownContent.classList.remove('show');
+    filterTitle.classList.remove("open");
+    dropdownContent.classList.remove("show");
   }
 });

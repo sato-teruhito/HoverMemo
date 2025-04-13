@@ -35,7 +35,7 @@ function createCommentWindow() {
           <button class="page-notes-close">×</button>
         </div>
       </div>
-      <textarea class="page-notes-textarea">${existingComment}</textarea>
+      <textarea class="page-notes-textarea" placeholder="ここにメモを入力...">${existingComment}</textarea>
       <div class="page-notes-selection">
         <label class="selection-button yes ${
           existingUseful === "yes" ? "selected" : ""
@@ -226,8 +226,7 @@ function showTooltip(element, noteData) {
 
     // usefulプロパティが存在する場合は、ステータスも表示
     if (noteData.useful) {
-      const usefulStatus =
-        noteData.useful === "yes" ? "〇 必要" : "× 不要";
+      const usefulStatus = noteData.useful === "yes" ? "〇 必要" : "× 不要";
       tooltipContent = `
         <div class="tooltip-status ${noteData.useful}">${usefulStatus}</div>
         ${tooltipContent}
@@ -326,17 +325,17 @@ function setTranslate(x, y) {
 
 // 検索結果ページでのホバー表示処理
 function setupSearchResultsHover() {
-    let links = [];
+  let links = [];
 
-    if (location.hostname.includes("google.com")) {
-      // Google 通常検索
-      links = Array.from(document.querySelectorAll("a:has(h3)"));
-    }
+  if (location.hostname.includes("google.com")) {
+    // Google 通常検索
+    links = Array.from(document.querySelectorAll("a:has(h3)"));
+  }
 
-    if (location.hostname.includes("scholar.google.co.jp")) {
-      // Google Scholar
-      links = Array.from(document.querySelectorAll("h3.gs_rt a"));
-    }
+  if (location.hostname.includes("scholar.google.co.jp")) {
+    // Google Scholar
+    links = Array.from(document.querySelectorAll("h3.gs_rt a"));
+  }
 
   links.forEach((link) => {
     if (!link.href) return;
@@ -437,5 +436,5 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       if (sendResponse) sendResponse({ success: false, error: error.message });
     }
   }
-  return true;  // 非同期レスポンスのために true を返す
+  return true; // 非同期レスポンスのために true を返す
 });
