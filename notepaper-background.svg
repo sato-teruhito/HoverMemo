@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <!-- 背景の白い紙 -->
+  <rect width="400" height="300" fill="#ffffff"/>
+  
+  <!-- 横線（薄い青） -->
+  <g stroke="#cce0ff" stroke-width="1">
+    <line x1="0" y1="24" x2="400" y2="24" />
+    <line x1="0" y1="48" x2="400" y2="48" />
+    <line x1="0" y1="72" x2="400" y2="72" />
+    <line x1="0" y1="96" x2="400" y2="96" />
+    <line x1="0" y1="120" x2="400" y2="120" />
+    <line x1="0" y1="144" x2="400" y2="144" />
+    <line x1="0" y1="168" x2="400" y2="168" />
+    <line x1="0" y1="192" x2="400" y2="192" />
+    <line x1="0" y1="216" x2="400" y2="216" />
+    <line x1="0" y1="240" x2="400" y2="240" />
+    <line x1="0" y1="264" x2="400" y2="264" />
+    <line x1="0" y1="288" x2="400" y2="288" />
+  </g>
+  
+  <!-- 左マージン（赤線） -->
+  <line x1="40" y1="0" x2="40" y2="300" stroke="#ffccd5" stroke-width="1"/>
+  
+  <!-- 影のエフェクト -->
+  <rect width="400" height="300" fill="url(#shadow)"/>
+  
+  <!-- グラデーション定義 -->
+  <defs>
+    <linearGradient id="shadow" x1="0" y1="0" x2="400" y2="300">
+      <stop offset="0%" stop-color="#00000000"/>
+      <stop offset="98%" stop-color="#00000010"/>
+    </linearGradient>
+  </defs>
+</svg>
