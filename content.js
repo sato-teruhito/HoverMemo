@@ -175,11 +175,48 @@ function deleteComment(specificUrl) {
   });
 }
 
+function getSearchResultLinks() {
+  let links = [];
+
+  const host = location.hostname;
+
+  if (host.includes("google.com")) {
+    // Google 通常検索
+    links = Array.from(document.querySelectorAll("a:has(h3)"));
+  } else if (host.includes("scholar.google.com")) {
+    // Google Scholar (.com / .co.jp どちらも対応)
+    links = Array.from(document.querySelectorAll("h3.gs_rt a"));
+  } else if (host.includes("scholar.google.co.jp")) {
+      // Google Scholar (.com / .co.jp どちらも対応)
+    links = Array.from(document.querySelectorAll("h3.gs_rt a"));
+  } else if (host.includes("search.yahoo.com")) {
+    // Yahoo! Japan
+    links = Array.from(document.querySelectorAll(".algo-sr a:has(h3), .sw-Card__title a:has(h3)"));
+  } else if (host.includes("search.yahoo.co.jp")) {
+    // Yahoo! Japan
+    links = Array.from(document.querySelectorAll(".algo-sr a:has(h3), .sw-Card__title a:has(h3)"));
+  } else if (host.includes("bing.com")) {
+    // Bing
+    links = Array.from(document.querySelectorAll(".b_algo h2 a"));
+  } else if (host.includes("bing.co.jp")) {
+    // Bing
+    links = Array.from(document.querySelectorAll(".b_algo h2 a"));
+  } else if (host.includes("zenn.dev")) {
+    // Zenn 記事ページ・トップなど
+    links = Array.from(document.querySelectorAll("a[href^='/articles/']"));
+  } else if (host.includes("qiita.com")) {
+    // Qiita 記事一覧
+    links = Array.from(document.querySelectorAll("h2 a[href^='/']"));
+  }
+
+  return links;
+}
+
 // リンクのスタイルを更新
 function updateLinkStyles() {
   chrome.storage.local.get(["pageNotes"], (result) => {
     const notes = result.pageNotes || {};
-    const links = document.querySelectorAll("a:has(h3)");
+    const links = getSearchResultLinks();
 
     links.forEach((link) => {
       if (!link.href) return;
@@ -316,7 +353,7 @@ function setTranslate(x, y) {
 
 // 検索結果ページでのホバー表示処理
 function setupSearchResultsHover() {
-  const links = document.querySelectorAll("a:has(h3)");
+  const links = getSearchResultLinks();
 
   links.forEach((link) => {
     if (!link.href) return;
