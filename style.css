@@ -203,37 +203,29 @@
   cursor: grabbing;
 }
 
-/* メモ用紙のようなテープ効果 */
-.page-notes-header::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 20px;
-  width: 40%;
-  height: 10px;
-  background: rgba(255, 235, 153, 0.8);
-  border-bottom-left-radius: 5px;
-  border-bottom-right-radius: 5px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+/* サイドメニュー */
+.side-menu-window {
+  position: fixed;
+  top: 50%;
+  right: 20px;
+  width: 250px;
+  background: white;
+  border: 1px solid #ccc;
+  padding: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  transform: translateY(-50%);
+  z-index: 10000;
 }
 
-/* アニメーション効果 */
-@keyframes paperFlutter {
-  0% {
-    transform: translate(0, 0) rotate(0.5deg);
-  }
-  25% {
-    transform: translate(1px, 0) rotate(0.7deg);
-  }
-  50% {
-    transform: translate(0, 1px) rotate(0.5deg);
-  }
-  75% {
-    transform: translate(-1px, 0) rotate(0.3deg);
-  }
-  100% {
-    transform: translate(0, 0) rotate(0.5deg);
-  }
+/* リンクスタイル */
+.useful-yes {
+  border-bottom: 3px solid #4caf50 !important;
+  text-decoration: none !important;
+}
+
+.useful-no {
+  border-bottom: 3px solid #f44336 !important;
+  text-decoration: none !important;
 }
 
 .page-notes-window:hover {

@@ -30,17 +30,29 @@ function updateNotesList() {
     const notesList = document.getElementById("notesList");
     notesList.innerHTML = "";
 
-    for (const [url, data] of Object.entries(notes)) {
-      const noteData =
-        typeof data === "string"
-          ? {
-              title: "不明なページ",
-              comment: data,
-              date: "不明な日付",
-              useful: "",
-            }
-          : data;
+    // エントリーを配列に変換して日付でソート
+    const sortedNotes = Object.entries(notes)
+      .map(([url, data]) => {
+        const noteData =
+          typeof data === "string"
+            ? {
+                title: "不明なページ",
+                comment: data,
+                date: "不明な日付",
+                useful: "",
+              }
+            : data;
+        return { url, ...noteData };
+      })
+      .sort((a, b) => {
+        // "不明な日付" は最後に表示
+        if (a.date === "不明な日付") return 1;
+        if (b.date === "不明な日付") return -1;
+        // 新しい日付が上に来るように降順でソート
+        return new Date(b.date) - new Date(a.date);
+      });
 
+    for (const noteData of sortedNotes) {
       // フィルター条件のチェック
       if (noteData.useful === "yes" && !filters.showUsefulYes) continue;
       if (noteData.useful === "no" && !filters.showUsefulNo) continue;
@@ -49,12 +61,12 @@ function updateNotesList() {
       noteItem.className = "note-item";
 
       const title = document.createElement("a");
-      title.href = url;
+      title.href = noteData.url;
       title.className = "note-title";
       title.textContent = noteData.title || "不明なページ";
       title.addEventListener("click", (e) => {
         e.preventDefault();
-        chrome.tabs.create({ url: url });
+        chrome.tabs.create({ url: noteData.url });
       });
 
       const infoRow = document.createElement("div");
@@ -62,7 +74,7 @@ function updateNotesList() {
 
       const date = document.createElement("div");
       date.className = "note-date";
-      date.textContent = `📅 ${noteData.date || "不明な日付"}`;
+      date.textContent = `📅 ${noteData.date}`;
 
       const useful = document.createElement("div");
       useful.className = `note-useful ${
@@ -75,7 +87,7 @@ function updateNotesList() {
       deleteBtn.textContent = "🗑 削除";
       deleteBtn.addEventListener("click", () => {
         if (confirm(`「${noteData.title}」のメモを削除しますか？`)) {
-          delete notes[url];
+          delete notes[noteData.url];
           chrome.storage.local.set({ pageNotes: notes }, () => {
             updateNotesList();
 
