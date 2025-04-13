@@ -89,14 +89,12 @@ function createCommentWindow() {
     const radios = commentWindow.querySelectorAll("input[name='useful']");
     const selectionButtons =
       commentWindow.querySelectorAll(".selection-button");
-    //const openMenuBtn = commentWindow.querySelector(".page-notes-menu");
     const openMenuBtn = commentWindow.querySelector(".page-notes-menu");
 
     // ドラッグ機能の初期化
     initDraggable();
 
     openMenuBtn.addEventListener("click", () => {
-      //createSideMenuWindow();
       chrome.runtime.sendMessage({ action: "openSidePanel" });
     });
 
@@ -147,109 +145,6 @@ function createCommentWindow() {
   });
 }
 
-// サイドメニューウィンドウを作成
-/*function createSideMenuWindow() {
-  if (sideMenuWindow) return;
-
-  sideMenuWindow = document.createElement("div");
-  sideMenuWindow.className = "side-menu-window";
-  sideMenuWindow.innerHTML = `
-    <div class="side-menu-header">
-      <span>保存されたメモ一覧</span>
-      <button class="side-menu-close">×</button>
-    </div>
-    <div class="side-menu-content">
-      <ul id="notesList"></ul>
-    </div>
-  `;
-
-  document.body.appendChild(sideMenuWindow);
-
-  const closeMenuBtn = sideMenuWindow.querySelector(".side-menu-close");
-  closeMenuBtn.addEventListener("click", () => {
-    sideMenuWindow.remove();
-    sideMenuWindow = null;
-  });
-
-  updateNotesList();
-}*/
-
-// メモ一覧を更新する関数
-/*function updateNotesList() {
-  if (!sideMenuWindow) return;
-
-  chrome.storage.local.get(["pageNotes"], (result) => {
-    const notes = result.pageNotes || {};
-    const notesList = sideMenuWindow.querySelector("#notesList");
-    notesList.innerHTML = "";
-
-    for (const [url, data] of Object.entries(notes)) {
-      const noteData =
-        typeof data === "string"
-          ? {
-              title: "不明なページ",
-              comment: data,
-              date: "不明な日付",
-              useful: "",
-            }
-          : data;
-
-      const listItem = document.createElement("li");
-      listItem.style.marginBottom = "10px";
-
-      const link = document.createElement("a");
-      link.href = url;
-      link.textContent = noteData.title || "不明なページ";
-      link.target = "_blank";
-      link.style.color = "blue";
-      link.style.textDecoration = "underline";
-      link.style.cursor = "pointer";
-      link.style.display = "block";
-
-      const date = document.createElement("span");
-      date.textContent = `📅 ${noteData.date || "不明な日付"}`;
-      date.style.display = "block";
-
-      const useful = document.createElement("span");
-      useful.textContent =
-        noteData.useful === "yes"
-          ? "〇 役立つ"
-          : noteData.useful === "no"
-          ? "× 役立たない"
-          : "";
-      useful.style.display = "block";
-
-      const comment = document.createElement("span");
-      comment.textContent = `📝 ${noteData.comment || "（メモなし）"}`;
-      comment.style.display = "block";
-
-      const deleteBtn = document.createElement("button");
-      deleteBtn.textContent = "🗑 削除";
-      deleteBtn.style.background = "red";
-      deleteBtn.style.color = "white";
-      deleteBtn.style.border = "none";
-      deleteBtn.style.padding = "5px 10px";
-      deleteBtn.style.cursor = "pointer";
-      deleteBtn.style.marginTop = "5px";
-      deleteBtn.style.display = "block";
-
-      deleteBtn.addEventListener("click", () => {
-        if (confirm(`「${noteData.title}」のメモを削除しますか？`)) {
-          deleteComment(url);
-        }
-      });
-
-      listItem.appendChild(link);
-      listItem.appendChild(date);
-      listItem.appendChild(useful);
-      listItem.appendChild(comment);
-      listItem.appendChild(deleteBtn);
-
-      notesList.appendChild(listItem);
-    }
-  });
-} */
-
 // コメントを保存
 function saveComment(comment, useful) {
   const url = window.location.href;
@@ -262,7 +157,6 @@ function saveComment(comment, useful) {
 
     chrome.storage.local.set({ pageNotes: notes }, () => {
       updateLinkStyles();
-      //updateNotesList();
     });
   });
 }
@@ -277,7 +171,6 @@ function deleteComment(specificUrl) {
 
     chrome.storage.local.set({ pageNotes: notes }, () => {
       updateLinkStyles();
-      //updateNotesList();
     });
   });
 }

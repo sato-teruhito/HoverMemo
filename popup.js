@@ -8,4 +8,3 @@ document.getElementById('changeColor').addEventListener('click', async () => {
     },
   });
 });
-//この野郎ふざけんな
