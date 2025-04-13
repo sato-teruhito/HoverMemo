@@ -3,26 +3,31 @@
   position: fixed;
   top: 0;
   left: 0;
-  width: 320px;
-  height: 325px;
+  width: 320px !important; /* 重要: 固定幅をどのページでも強制適用 */
+  height: 305px !important; /* 重要: 固定高さをどのページでも強制適用 */
+  min-width: 320px !important; /* 最小幅を設定 */
+  min-height: 305px !important; /* 最小高さを設定 */
+  max-width: 320px !important; /* 最大幅を設定 */
+  max-height: 305px !important; /* 最大高さを設定 */
   background: #fffef0; /* メモ帳風の薄い黄色背景 */
   border: 1px solid #ddd;
   border-radius: 8px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15), 0 0 3px rgba(0, 0, 0, 0.05);
   z-index: 10000;
-  box-sizing: border-box;
+  box-sizing: border-box !important; /* !importantで上書き防止 */
   background-image: linear-gradient(#fffef0 1px, transparent 1px);
   background-size: 100% 24px; /* 罫線の間隔 */
   overflow: hidden; /* 罫線が枠外に出ないように */
+  resize: none !important; /* リサイズ防止 */
 }
 
 /* ウィンドウ全体のフォント設定を固定 */
 .page-notes-window,
 .side-menu-window {
   font-family: "Segoe UI", "メイリオ", Meiryo, "ヒラギノ角ゴ Pro W3",
-    "Hiragino Kaku Gothic Pro", sans-serif;
-  font-size: 14px;
-  line-height: 1.5;
+    "Hiragino Kaku Gothic Pro", sans-serif !important;
+  font-size: 14px !important;
+  line-height: 1.5 !important;
 }
 
 /* ドラッグ中のスタイル */
@@ -42,16 +47,20 @@
   border-bottom: 1px solid #e6e6c8; /* メモ帳風の線色 */
   background: #fffddc; /* メモ帳風のヘッダー背景 */
   user-select: none;
-  height: 34px;
+  height: 34px !important; /* 固定高さを強制 */
+  min-height: 34px !important;
+  max-height: 34px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
 }
 
 /* タイトルのスタイル固定 */
 .page-notes-header span,
 .side-menu-header span {
-  font-size: 14px;
-  font-weight: bold;
+  font-size: 14px !important;
+  font-weight: bold !important;
   flex-grow: 1;
-  color: #5a5a4d; /* メモ帳風の暗めの文字色 */
+  color: #5a5a4d !important; /* メモ帳風の暗めの文字色 */
 }
 
 /* ヘッダーボタングループ */
@@ -64,28 +73,32 @@
 .page-notes-close,
 .page-notes-menu,
 .side-menu-close {
-  border: none;
-  background: none;
+  border: none !important;
+  background: none !important;
   cursor: pointer;
-  font-size: 18px;
-  color: #777766; /* メモ帳風のボタン色 */
+  font-size: 18px !important;
+  color: #777766 !important; /* メモ帳風のボタン色 */
+  padding: 4px !important;
+  margin: 0 !important;
+  min-width: unset !important;
+  min-height: unset !important;
 }
 
 .page-notes-close:hover,
 .page-notes-menu:hover {
-  color: #444433; /* ホバー時の色 */
+  color: #444433 !important; /* ホバー時の色 */
 }
 
 /*メモ一覧ボタン追加にあたり変更しました*/
 .page-notes-menu {
-  margin-right: 8px;
-  padding: 4px 8px;
-  border-radius: 4px;
-  background: #f5f5e5; /* メモ帳風の淡い色 */
-  border: 1px solid #d8d8c0; /* メモ帳風の境界線 */
-  font-size: 14px;
-  display: flex;
-  align-items: center;
+  margin-right: 8px !important;
+  padding: 4px 8px !important;
+  border-radius: 4px !important;
+  background: #f5f5e5 !important; /* メモ帳風の淡い色 */
+  border: 1px solid #d8d8c0 !important; /* メモ帳風の境界線 */
+  font-size: 14px !important;
+  display: flex !important;
+  align-items: center !important;
 }
 
 .page-notes-menu:before {
@@ -94,117 +107,134 @@
 }
 
 .page-notes-menu:hover {
-  background: #f0f0d8;
+  background: #f0f0d8 !important;
 }
 
 .page-notes-close {
-  font-size: 18px;
+  font-size: 18px !important;
 }
 
 /* テキストエリア */
 .page-notes-textarea {
-  width: 100%;
-  height: 150px;
-  padding: 12px 15px;
-  border: none;
-  resize: none;
-  box-sizing: border-box;
-  font-size: 14px;
-  line-height: 24px; /* 罫線に合わせる */
-  overflow-y: auto;
-  background: transparent; /* 背景を透明に */
-  color: #333322; /* メモ帳風の文字色 */
-  font-family: "Segoe UI", "メイリオ", Meiryo, sans-serif;
+  width: 100% !important;
+  height: 150px !important;
+  min-height: 150px !important;
+  max-height: 150px !important;
+  padding: 12px 15px !important;
+  border: none !important;
+  resize: none !important;
+  box-sizing: border-box !important;
+  font-size: 14px !important;
+  line-height: 24px !important; /* 罫線に合わせる */
+  overflow-y: auto !important;
+  background: transparent !important; /* 背景を透明に */
+  color: #333322 !important; /* メモ帳風の文字色 */
+  font-family: "Segoe UI", "メイリオ", Meiryo, sans-serif !important;
+  margin: 0 !important;
 }
 
 .page-notes-textarea:focus {
-  outline: none;
+  outline: none !important;
 }
 
 /* 有用性選択部分 */
 .page-notes-selection {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  padding: 10px;
-  border-top: 1px solid #e6e6c8; /* メモ帳風の線色 */
-  height: 52px;
-  box-sizing: border-box;
-  background: #fffefa; /* メモ帳風の背景 */
+  display: flex !important;
+  justify-content: center !important;
+  gap: 20px !important;
+  padding: 8px !important; /* 10px → 8px に減らす */
+  border-top: 1px solid #e6e6c8 !important; /* メモ帳風の線色 */
+  height: 46px !important; /* 52px → 46px に減らす */
+  min-height: 46px !important;
+  max-height: 46px !important;
+  box-sizing: border-box !important;
+  background: #fffefa !important; /* メモ帳風の背景 */
+  width: 100% !important;
+  margin: 0 !important;
 }
 
 .selection-button {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  cursor: pointer;
-  padding: 8px 15px;
-  border-radius: 20px;
-  transition: all 0.3s ease;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  display: flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  cursor: pointer !important;
+  padding: 6px 15px !important; /* 8px → 6px に減らす */
+  border-radius: 20px !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+  margin: 0 !important;
 }
 
 .selection-button input[type="radio"] {
-  display: none;
+  display: none !important;
 }
 
 .selection-button.yes {
-  border: 2px solid #7ab85c; /* メモ帳風の緑 */
-  color: #5a884a;
+  border: 2px solid #7ab85c !important; /* メモ帳風の緑 */
+  color: #5a884a !important;
 }
 
 .selection-button.no {
-  border: 2px solid #e57373; /* メモ帳風の赤 */
-  color: #a85c5c;
+  border: 2px solid #e57373 !important; /* メモ帳風の赤 */
+  color: #a85c5c !important;
 }
 
 .selection-button.yes.selected {
-  background-color: #7ab85c;
-  color: white;
+  background-color: #7ab85c !important;
+  color: white !important;
 }
 
 .selection-button.no.selected {
-  background-color: #e57373;
-  color: white;
+  background-color: #e57373 !important;
+  color: white !important;
 }
 
 .selection-icon {
-  font-size: 16px;
-  font-weight: bold;
+  font-size: 16px !important;
+  font-weight: bold !important;
 }
 
 /* ボタン領域 */
 .page-notes-buttons {
-  display: flex;
-  gap: 8px;
-  padding: 12px;
-  box-sizing: border-box;
-  height: 62px;
-  background: #fffefa; /* メモ帳風の背景 */
-  border-top: 1px solid #e6e6c8; /* メモ帳風の線色 */
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 12px 12px 8px 12px !important; /* 上12px・右12px・下8px・左12px */
+  box-sizing: border-box !important;
+  height: 50px !important; /* 62px → 50px に減らす */
+  min-height: 50px !important;
+  max-height: 50px !important;
+  background: #fffefa !important; /* メモ帳風の背景 */
+  border-top: 1px solid #e6e6c8 !important; /* メモ帳風の線色 */
+  width: 100% !important;
+  margin: 0 !important;
 }
 
 /* 保存ボタン */
 .page-notes-save {
-  flex: 1;
-  padding: 8px;
-  color: white;
-  border: none;
-  cursor: pointer;
-  border-radius: 4px;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  flex: 1 !important;
+  padding: 6px !important; /* 8px → 6px に減らす */
+  color: white !important;
+  border: none !important;
+  cursor: pointer !important;
+  border-radius: 4px !important;
+  font-weight: bold !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15) !important;
+  min-width: unset !important;
+  min-height: unset !important;
+  margin: 0 !important;
 }
 
 .page-notes-save:before {
-  margin-right: 6px;
+  margin-right: 6px !important;
 }
 
 .page-notes-create {
-  background: #7ab85c; /* メモ帳風の緑 */
+  background: #7ab85c !important; /* メモ帳風の緑 */
 }
 
 .page-notes-create:before {
@@ -212,7 +242,7 @@
 }
 
 .page-notes-update {
-  background: #5b9bd5; /* メモ帳風の青 */
+  background: #5b9bd5 !important; /* メモ帳風の青 */
 }
 
 .page-notes-update:before {
@@ -221,97 +251,103 @@
 
 /* 削除ボタン */
 .page-notes-delete {
-  flex: 1;
-  padding: 8px;
-  background: #e57373; /* メモ帳風の赤 */
-  color: white;
-  border: none;
-  cursor: pointer;
-  border-radius: 4px;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  flex: 1 !important;
+  padding: 6px !important; /* 8px → 6px に減らす */
+  background: #e57373 !important; /* メモ帳風の赤 */
+  color: white !important;
+  border: none !important;
+  cursor: pointer !important;
+  border-radius: 4px !important;
+  font-weight: bold !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15) !important;
+  min-width: unset !important;
+  min-height: unset !important;
+  margin: 0 !important;
 }
 
 .page-notes-delete:before {
   content: "🗑️"; /* ゴミ箱アイコン */
-  margin-right: 6px;
+  margin-right: 6px !important;
 }
 
 /* ボタンホバーエフェクト */
 .page-notes-save:hover,
 .page-notes-delete:hover {
-  filter: brightness(1.05);
-  transform: translateY(-1px);
-  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
-  transition: all 0.2s ease;
+  filter: brightness(1.05) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2) !important;
+  transition: all 0.2s ease !important;
 }
 
 .page-notes-save:active,
 .page-notes-delete:active {
-  transform: translateY(1px);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  transform: translateY(1px) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
 }
 
 /* ツールチップ */
 .page-notes-tooltip {
-  position: absolute;
-  background: #fffef0; /* メモ帳風の背景 */
-  color: #333322;
-  padding: 12px;
-  border-radius: 4px;
-  min-width: 250px;
-  max-width: 400px;
-  z-index: 10000;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
-  border: 1px solid #e6e6c8;
-  font-family: "Segoe UI", "メイリオ", Meiryo, sans-serif;
+  position: absolute !important;
+  background: #fffef0 !important; /* メモ帳風の背景 */
+  color: #333322 !important;
+  padding: 12px !important;
+  border-radius: 4px !important;
+  min-width: 250px !important;
+  max-width: 400px !important;
+  z-index: 10000 !important;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15) !important;
+  border: 1px solid #e6e6c8 !important;
+  font-family: "Segoe UI", "メイリオ", Meiryo, sans-serif !important;
 }
 
 .tooltip-status {
-  font-size: 12px;
-  font-weight: bold;
-  margin-bottom: 8px;
-  padding: 4px 8px;
-  border-radius: 12px;
-  display: inline-block;
+  font-size: 12px !important;
+  font-weight: bold !important;
+  margin-bottom: 8px !important;
+  padding: 4px 8px !important;
+  border-radius: 12px !important;
+  display: inline-block !important;
 }
 
 .tooltip-status.yes {
-  background: #e8f5e9;
-  color: #4caf50;
+  background: #e8f5e9 !important;
+  color: #4caf50 !important;
 }
 
 .tooltip-status.no {
-  background: #ffebee;
-  color: #f44336;
+  background: #ffebee !important;
+  color: #f44336 !important;
 }
 
 .tooltip-text {
-  margin-top: 5px;
-  white-space: pre-wrap;
-  font-size: 14px;
-  line-height: 1.5;
-  background-image: linear-gradient(transparent 23px, #e6e6c8 24px);
-  background-size: 100% 24px;
-  padding: 0 0 0 4px;
+  margin-top: 5px !important;
+  white-space: pre-wrap !important;
+  font-size: 14px !important;
+  line-height: 1.5 !important;
+  background-image: linear-gradient(transparent 23px, #e6e6c8 24px) !important;
+  background-size: 100% 24px !important;
+  padding: 0 0 0 4px !important;
 }
 
 /* サイドメニュー */
 .side-menu-window {
-  position: fixed;
-  top: 50%;
-  right: 20px;
-  width: 250px;
-  background: #fffef0;
-  border: 1px solid #e6e6c8;
-  padding: 10px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-  transform: translateY(-50%);
-  z-index: 10000;
-  border-radius: 8px;
+  position: fixed !important;
+  top: 50% !important;
+  right: 20px !important;
+  width: 250px !important;
+  min-width: 250px !important;
+  max-width: 250px !important;
+  background: #fffef0 !important;
+  border: 1px solid #e6e6c8 !important;
+  padding: 10px !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15) !important;
+  transform: translateY(-50%) !important;
+  z-index: 10000 !important;
+  border-radius: 8px !important;
+  box-sizing: border-box !important;
 }
 
 /* リンクスタイル */
