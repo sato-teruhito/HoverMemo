@@ -286,7 +286,18 @@ function deleteComment(specificUrl) {
 function updateLinkStyles() {
   chrome.storage.local.get(["pageNotes"], (result) => {
     const notes = result.pageNotes || {};
-    const links = document.querySelectorAll("a:has(h3)");
+    let links = [];
+
+    if (location.hostname.includes("google.com")) {
+      // Google 通常検索
+      links = Array.from(document.querySelectorAll("a:has(h3)"));
+    }
+  
+    if (location.hostname.includes("scholar.google.com")) {
+      // Google Scholar
+      links = Array.from(document.querySelectorAll("h3.gs_rt a"));
+    }
+  
 
     links.forEach((link) => {
       if (!link.href) return;
@@ -423,7 +434,17 @@ function setTranslate(x, y) {
 
 // 検索結果ページでのホバー表示処理
 function setupSearchResultsHover() {
-  const links = document.querySelectorAll("a:has(h3)");
+  let links = [];
+
+    if (location.hostname.includes("google.com")) {
+      // Google 通常検索
+      links = Array.from(document.querySelectorAll("a:has(h3)"));
+    }
+  
+    if (location.hostname.includes("scholar.google.com")) {
+      // Google Scholar
+      links = Array.from(document.querySelectorAll("h3.gs_rt a"));
+    }
 
   links.forEach((link) => {
     if (!link.href) return;
