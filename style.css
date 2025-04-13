@@ -1,206 +1,302 @@
-/* メモ用紙風スタイル */
+/* メインウィンドウのスタイル */
 .page-notes-window {
-  background-color: #fffdf0; /* 薄い黄色の背景色 (クリーム色) */
-  border: 1px solid #e0d8b0;
-  border-radius: 2px;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-  font-family: "Comic Sans MS", "Arial", sans-serif;
   position: fixed;
+  top: 0;
+  left: 0;
   width: 320px;
-  z-index: 9999;
-  /* メモ用紙のような影を付ける */
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24),
-    2px 2px 0 rgba(0, 0, 0, 0.1);
-  /* メモが少し傾いているような効果 */
-  transform-origin: top left;
-  transform: translate(0, 0) rotate(0.5deg);
+  height: 325px;
+  background: #fffef0; /* メモ帳風の薄い黄色背景 */
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15), 0 0 3px rgba(0, 0, 0, 0.05);
+  z-index: 10000;
+  box-sizing: border-box;
+  background-image: linear-gradient(#fffef0 1px, transparent 1px);
+  background-size: 100% 24px; /* 罫線の間隔 */
+  overflow: hidden; /* 罫線が枠外に出ないように */
 }
 
-/* メモのヘッダー部分 */
-.page-notes-header {
-  background-color: #ffeb99; /* 少し濃い黄色 */
-  padding: 10px;
-  cursor: move;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px dashed #ccc; /* 点線の区切り */
-  font-weight: bold;
-  color: #555;
-}
-
-/* タイトル部分をデコレーション */
-.page-notes-header span {
-  font-family: "Comic Sans MS", "Arial", sans-serif;
-  color: #8b4513; /* 茶色のテキスト */
-  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
-}
-
-/* メモのテキストエリア */
-.page-notes-textarea {
-  width: 100%;
-  height: 150px;
-  padding: 10px;
-  border: none;
-  background-color: #fffdf0;
-  font-family: "Comic Sans MS", "Arial", sans-serif;
+/* ウィンドウ全体のフォント設定を固定 */
+.page-notes-window,
+.side-menu-window {
+  font-family: "Segoe UI", "メイリオ", Meiryo, "ヒラギノ角ゴ Pro W3",
+    "Hiragino Kaku Gothic Pro", sans-serif;
   font-size: 14px;
   line-height: 1.5;
-  resize: vertical;
-  box-sizing: border-box;
-  background-image: linear-gradient(#e1e1e1 1px, transparent 1px);
-  background-size: 100% 24px; /* 罫線の間隔 */
-  background-position: 0 20px;
-  padding-top: 20px; /* 最初の行のスペース */
-  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.05);
-}
-
-/* 選択ボタン部分 */
-.page-notes-selection {
-  display: flex;
-  padding: 10px;
-  background-color: #fffdf0;
-  border-top: 1px dashed #e0d8b0;
-}
-
-/* 選択ボタンのスタイル */
-.selection-button {
-  flex: 1;
-  padding: 8px;
-  margin: 0 5px;
-  text-align: center;
-  cursor: pointer;
-  border-radius: 4px;
-  transition: background-color 0.3s;
-  border: 1px solid #e0d8b0;
-  background-color: #fffdf0;
-}
-
-.selection-button:hover {
-  background-color: #fff8cc;
-}
-
-.selection-button.selected {
-  background-color: #ffeb99;
-  font-weight: bold;
-}
-
-.selection-button.yes.selected {
-  border-color: #4caf50;
-  color: #4caf50;
-}
-
-.selection-button.no.selected {
-  border-color: #f44336;
-  color: #f44336;
-}
-
-/* ボタン部分 */
-.page-notes-buttons {
-  display: flex;
-  padding: 10px;
-  justify-content: space-between;
-  background-color: #fffdf0;
-  border-top: 1px dashed #e0d8b0;
-}
-
-/* ボタンのスタイル */
-.page-notes-buttons button {
-  padding: 8px 15px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  cursor: pointer;
-  font-family: "Comic Sans MS", "Arial", sans-serif;
-  font-size: 13px;
-  transition: all 0.3s;
-}
-
-.page-notes-save {
-  background-color: #4caf50;
-  color: white;
-  border-color: #4caf50;
-}
-
-.page-notes-save:hover {
-  background-color: #45a049;
-}
-
-.page-notes-delete {
-  background-color: #f44336;
-  color: white;
-  border-color: #f44336;
-}
-
-.page-notes-delete:hover {
-  background-color: #d32f2f;
-}
-
-/* ピン留め効果のための装飾 */
-.page-notes-window::before {
-  content: "";
-  position: absolute;
-  width: 30px;
-  height: 30px;
-  background: radial-gradient(circle, #f44336 20%, #d32f2f 100%);
-  border-radius: 50%;
-  top: -15px;
-  right: 20px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  z-index: 1;
-}
-
-.page-notes-window::after {
-  content: "";
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  background: #fff;
-  border-radius: 50%;
-  top: -10px;
-  right: 25px;
-  box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.2);
-  z-index: 2;
-}
-
-/* ツールチップのスタイル */
-.page-notes-tooltip {
-  position: absolute;
-  background-color: #fffdf0;
-  border: 1px solid #e0d8b0;
-  padding: 10px;
-  border-radius: 5px;
-  font-family: "Comic Sans MS", "Arial", sans-serif;
-  font-size: 13px;
-  max-width: 300px;
-  z-index: 10000;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-}
-
-.tooltip-status {
-  font-weight: bold;
-  margin-bottom: 5px;
-  padding: 3px;
-  border-radius: 3px;
-}
-
-.tooltip-status.yes {
-  background-color: #e8f5e9;
-  color: #4caf50;
-}
-
-.tooltip-status.no {
-  background-color: #ffebee;
-  color: #f44336;
-}
-
-.tooltip-text {
-  line-height: 1.4;
 }
 
 /* ドラッグ中のスタイル */
 .page-notes-window.dragging {
-  opacity: 0.8;
-  cursor: grabbing;
+  opacity: 0.92;
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.2), 0 0 5px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease;
+}
+
+/* ヘッダー */
+.page-notes-header,
+.side-menu-header {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 12px;
+  border-bottom: 1px solid #e6e6c8; /* メモ帳風の線色 */
+  background: #fffddc; /* メモ帳風のヘッダー背景 */
+  user-select: none;
+  height: 34px;
+}
+
+/* タイトルのスタイル固定 */
+.page-notes-header span,
+.side-menu-header span {
+  font-size: 14px;
+  font-weight: bold;
+  flex-grow: 1;
+  color: #5a5a4d; /* メモ帳風の暗めの文字色 */
+}
+
+/* ヘッダーボタングループ */
+.header-buttons {
+  display: flex;
+  align-items: center;
+}
+
+/* ボタン共通スタイル */
+.page-notes-close,
+.page-notes-menu,
+.side-menu-close {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 18px;
+  color: #777766; /* メモ帳風のボタン色 */
+}
+
+.page-notes-close:hover,
+.page-notes-menu:hover {
+  color: #444433; /* ホバー時の色 */
+}
+
+/*メモ一覧ボタン追加にあたり変更しました*/
+.page-notes-menu {
+  margin-right: 8px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: #f5f5e5; /* メモ帳風の淡い色 */
+  border: 1px solid #d8d8c0; /* メモ帳風の境界線 */
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+}
+
+.page-notes-menu:before {
+  content: "📋"; /* メモアイコン */
+  margin-right: 4px;
+}
+
+.page-notes-menu:hover {
+  background: #f0f0d8;
+}
+
+.page-notes-close {
+  font-size: 18px;
+}
+
+/* テキストエリア */
+.page-notes-textarea {
+  width: 100%;
+  height: 150px;
+  padding: 12px 15px;
+  border: none;
+  resize: none;
+  box-sizing: border-box;
+  font-size: 14px;
+  line-height: 24px; /* 罫線に合わせる */
+  overflow-y: auto;
+  background: transparent; /* 背景を透明に */
+  color: #333322; /* メモ帳風の文字色 */
+  font-family: "Segoe UI", "メイリオ", Meiryo, sans-serif;
+}
+
+.page-notes-textarea:focus {
+  outline: none;
+}
+
+/* 有用性選択部分 */
+.page-notes-selection {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  padding: 10px;
+  border-top: 1px solid #e6e6c8; /* メモ帳風の線色 */
+  height: 52px;
+  box-sizing: border-box;
+  background: #fffefa; /* メモ帳風の背景 */
+}
+
+.selection-button {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  padding: 8px 15px;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.selection-button input[type="radio"] {
+  display: none;
+}
+
+.selection-button.yes {
+  border: 2px solid #7ab85c; /* メモ帳風の緑 */
+  color: #5a884a;
+}
+
+.selection-button.no {
+  border: 2px solid #e57373; /* メモ帳風の赤 */
+  color: #a85c5c;
+}
+
+.selection-button.yes.selected {
+  background-color: #7ab85c;
+  color: white;
+}
+
+.selection-button.no.selected {
+  background-color: #e57373;
+  color: white;
+}
+
+.selection-icon {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+/* ボタン領域 */
+.page-notes-buttons {
+  display: flex;
+  gap: 8px;
+  padding: 12px;
+  box-sizing: border-box;
+  height: 62px;
+  background: #fffefa; /* メモ帳風の背景 */
+  border-top: 1px solid #e6e6c8; /* メモ帳風の線色 */
+}
+
+/* 保存ボタン */
+.page-notes-save {
+  flex: 1;
+  padding: 8px;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.page-notes-save:before {
+  margin-right: 6px;
+}
+
+.page-notes-create {
+  background: #7ab85c; /* メモ帳風の緑 */
+}
+
+.page-notes-create:before {
+  content: "✏️"; /* 鉛筆アイコン */
+}
+
+.page-notes-update {
+  background: #5b9bd5; /* メモ帳風の青 */
+}
+
+.page-notes-update:before {
+  content: "💾"; /* 保存アイコン */
+}
+
+/* 削除ボタン */
+.page-notes-delete {
+  flex: 1;
+  padding: 8px;
+  background: #e57373; /* メモ帳風の赤 */
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.page-notes-delete:before {
+  content: "🗑️"; /* ゴミ箱アイコン */
+  margin-right: 6px;
+}
+
+/* ボタンホバーエフェクト */
+.page-notes-save:hover,
+.page-notes-delete:hover {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+.page-notes-save:active,
+.page-notes-delete:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* ツールチップ */
+.page-notes-tooltip {
+  position: absolute;
+  background: #fffef0; /* メモ帳風の背景 */
+  color: #333322;
+  padding: 12px;
+  border-radius: 4px;
+  min-width: 250px;
+  max-width: 400px;
+  z-index: 10000;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e6e6c8;
+  font-family: "Segoe UI", "メイリオ", Meiryo, sans-serif;
+}
+
+.tooltip-status {
+  font-size: 12px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  padding: 4px 8px;
+  border-radius: 12px;
+  display: inline-block;
+}
+
+.tooltip-status.yes {
+  background: #e8f5e9;
+  color: #4caf50;
+}
+
+.tooltip-status.no {
+  background: #ffebee;
+  color: #f44336;
+}
+
+.tooltip-text {
+  margin-top: 5px;
+  white-space: pre-wrap;
+  font-size: 14px;
+  line-height: 1.5;
+  background-image: linear-gradient(transparent 23px, #e6e6c8 24px);
+  background-size: 100% 24px;
+  padding: 0 0 0 4px;
 }
 
 /* サイドメニュー */
@@ -209,25 +305,27 @@
   top: 50%;
   right: 20px;
   width: 250px;
-  background: white;
-  border: 1px solid #ccc;
+  background: #fffef0;
+  border: 1px solid #e6e6c8;
   padding: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
   transform: translateY(-50%);
   z-index: 10000;
+  border-radius: 8px;
 }
 
 /* リンクスタイル */
 .useful-yes {
-  border-bottom: 3px solid #4caf50 !important;
+  border-bottom: 3px solid #7ab85c !important;
   text-decoration: none !important;
 }
 
 .useful-no {
-  border-bottom: 3px solid #f44336 !important;
+  border-bottom: 3px solid #e57373 !important;
   text-decoration: none !important;
 }
 
-.page-notes-window:hover {
-  animation: paperFlutter 5s infinite ease-in-out;
+.useful-yes:hover,
+.useful-no:hover {
+  text-decoration: none !important;
 }
