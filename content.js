@@ -180,33 +180,24 @@ function getSearchResultLinks() {
 
   const host = location.hostname;
 
-  if (host.includes("google.com")) {
+  if (host === "www.google.com" || host === "www.google.co.jp") {
     // Google 通常検索
     links = Array.from(document.querySelectorAll("a:has(h3)"));
-  } else if (host.includes("scholar.google.com")) {
-    // Google Scholar (.com / .co.jp どちらも対応)
+  } else if (host === "scholar.google.com" || host === "scholar.google.co.jp") {
+    // Google Scholar
     links = Array.from(document.querySelectorAll("h3.gs_rt a"));
-  } else if (host.includes("scholar.google.co.jp")) {
-      // Google Scholar (.com / .co.jp どちらも対応)
-    links = Array.from(document.querySelectorAll("h3.gs_rt a"));
-  } else if (host.includes("search.yahoo.com")) {
+  } else if (host === "search.yahoo.com" || host === "search.yahoo.co.jp") {
     // Yahoo! Japan
-    links = Array.from(document.querySelectorAll(".algo-sr a:has(h3), .sw-Card__title a:has(h3)"));
-  } else if (host.includes("search.yahoo.co.jp")) {
-    // Yahoo! Japan
-    links = Array.from(document.querySelectorAll(".algo-sr a:has(h3), .sw-Card__title a:has(h3)"));
-  } else if (host.includes("bing.com")) {
+    links = Array.from(document.querySelectorAll("a.sw-Card__title"));
+  } else if (host == "bing.com" || host === "bing.co.jp") {
     // Bing
-    links = Array.from(document.querySelectorAll(".b_algo h2 a"));
-  } else if (host.includes("bing.co.jp")) {
-    // Bing
-    links = Array.from(document.querySelectorAll(".b_algo h2 a"));
-  } else if (host.includes("zenn.dev")) {
+    links = Array.from(document.querySelectorAll("h2 a"));
+  } else if (host === "zenn.dev") {
     // Zenn 記事ページ・トップなど
-    links = Array.from(document.querySelectorAll("a[href^='/articles/']"));
-  } else if (host.includes("qiita.com")) {
+    links = Array.from(document.querySelectorAll("a.ArticleList_link__4Igs4"));
+  } else if (host === "qiita.com") {
     // Qiita 記事一覧
-    links = Array.from(document.querySelectorAll("h2 a[href^='/']"));
+    links = Array.from(document.querySelectorAll("h2.style-1ws5e6r a, h3.style-1eiv6gj a"));
   }
 
   return links;
@@ -216,17 +207,7 @@ function getSearchResultLinks() {
 function updateLinkStyles() {
   chrome.storage.local.get(["pageNotes"], (result) => {
     const notes = result.pageNotes || {};
-    let links = [];
-
-    if (location.hostname.includes("google.com")) {
-      // Google 通常検索
-      links = Array.from(document.querySelectorAll("a:has(h3)"));
-    }
-
-    if (location.hostname.includes("scholar.google.co.jp")) {
-      // Google Scholar
-      links = Array.from(document.querySelectorAll("h3.gs_rt a"));
-    }
+    const links = getSearchResultLinks();
 
     links.forEach((link) => {
       if (!link.href) return;
@@ -363,17 +344,7 @@ function setTranslate(x, y) {
 
 // 検索結果ページでのホバー表示処理
 function setupSearchResultsHover() {
-    let links = [];
-
-    if (location.hostname.includes("google.com")) {
-      // Google 通常検索
-      links = Array.from(document.querySelectorAll("a:has(h3)"));
-    }
-
-    if (location.hostname.includes("scholar.google.co.jp")) {
-      // Google Scholar
-      links = Array.from(document.querySelectorAll("h3.gs_rt a"));
-    }
+  const links = getSearchResultLinks();
 
   links.forEach((link) => {
     if (!link.href) return;
