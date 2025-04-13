@@ -25,9 +25,6 @@ function createCommentWindow() {
         : existingNote || "";
     const existingUseful = existingNote.useful || "";
 
-    // まずスタイルをインジェクト
-    injectStyles();
-
     commentWindow = document.createElement("div");
     commentWindow.className = "page-notes-window";
     commentWindow.innerHTML = `
