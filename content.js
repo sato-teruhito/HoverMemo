@@ -179,7 +179,17 @@ function deleteComment(specificUrl) {
 function updateLinkStyles() {
   chrome.storage.local.get(["pageNotes"], (result) => {
     const notes = result.pageNotes || {};
-    const links = document.querySelectorAll("a:has(h3)");
+    let links = [];
+
+    if (location.hostname.includes("google.com")) {
+      // Google 通常検索
+      links = Array.from(document.querySelectorAll("a:has(h3)"));
+    }
+
+    if (location.hostname.includes("scholar.google.co.jp")) {
+      // Google Scholar
+      links = Array.from(document.querySelectorAll("h3.gs_rt a"));
+    }
 
     links.forEach((link) => {
       if (!link.href) return;
@@ -316,7 +326,17 @@ function setTranslate(x, y) {
 
 // 検索結果ページでのホバー表示処理
 function setupSearchResultsHover() {
-  const links = document.querySelectorAll("a:has(h3)");
+    let links = [];
+
+    if (location.hostname.includes("google.com")) {
+      // Google 通常検索
+      links = Array.from(document.querySelectorAll("a:has(h3)"));
+    }
+
+    if (location.hostname.includes("scholar.google.co.jp")) {
+      // Google Scholar
+      links = Array.from(document.querySelectorAll("h3.gs_rt a"));
+    }
 
   links.forEach((link) => {
     if (!link.href) return;
@@ -405,3 +425,17 @@ if (document.readyState === "loading") {
 } else {
   initialize();
 }
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === "updateLinkStyles") {
+    try {
+      updateLinkStyles();
+      setupSearchResultsHover();
+      if (sendResponse) sendResponse({ success: true });
+    } catch (error) {
+      console.error("Error updating link styles:", error);
+      if (sendResponse) sendResponse({ success: false, error: error.message });
+    }
+  }
+  return true;  // 非同期レスポンスのために true を返す
+});
