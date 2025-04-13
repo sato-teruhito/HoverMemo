@@ -25,6 +25,9 @@ function createCommentWindow() {
         : existingNote || "";
     const existingUseful = existingNote.useful || "";
 
+    // まずスタイルをインジェクト
+    injectStyles();
+
     commentWindow = document.createElement("div");
     commentWindow.className = "page-notes-window";
     commentWindow.innerHTML = `
@@ -89,14 +92,12 @@ function createCommentWindow() {
     const radios = commentWindow.querySelectorAll("input[name='useful']");
     const selectionButtons =
       commentWindow.querySelectorAll(".selection-button");
-    //const openMenuBtn = commentWindow.querySelector(".page-notes-menu");
     const openMenuBtn = commentWindow.querySelector(".page-notes-menu");
 
     // ドラッグ機能の初期化
     initDraggable();
 
     openMenuBtn.addEventListener("click", () => {
-      //createSideMenuWindow();
       chrome.runtime.sendMessage({ action: "openSidePanel" });
     });
 
@@ -147,109 +148,6 @@ function createCommentWindow() {
   });
 }
 
-// サイドメニューウィンドウを作成
-/*function createSideMenuWindow() {
-  if (sideMenuWindow) return;
-
-  sideMenuWindow = document.createElement("div");
-  sideMenuWindow.className = "side-menu-window";
-  sideMenuWindow.innerHTML = `
-    <div class="side-menu-header">
-      <span>保存されたメモ一覧</span>
-      <button class="side-menu-close">×</button>
-    </div>
-    <div class="side-menu-content">
-      <ul id="notesList"></ul>
-    </div>
-  `;
-
-  document.body.appendChild(sideMenuWindow);
-
-  const closeMenuBtn = sideMenuWindow.querySelector(".side-menu-close");
-  closeMenuBtn.addEventListener("click", () => {
-    sideMenuWindow.remove();
-    sideMenuWindow = null;
-  });
-
-  updateNotesList();
-}*/
-
-// メモ一覧を更新する関数
-/*function updateNotesList() {
-  if (!sideMenuWindow) return;
-
-  chrome.storage.local.get(["pageNotes"], (result) => {
-    const notes = result.pageNotes || {};
-    const notesList = sideMenuWindow.querySelector("#notesList");
-    notesList.innerHTML = "";
-
-    for (const [url, data] of Object.entries(notes)) {
-      const noteData =
-        typeof data === "string"
-          ? {
-              title: "不明なページ",
-              comment: data,
-              date: "不明な日付",
-              useful: "",
-            }
-          : data;
-
-      const listItem = document.createElement("li");
-      listItem.style.marginBottom = "10px";
-
-      const link = document.createElement("a");
-      link.href = url;
-      link.textContent = noteData.title || "不明なページ";
-      link.target = "_blank";
-      link.style.color = "blue";
-      link.style.textDecoration = "underline";
-      link.style.cursor = "pointer";
-      link.style.display = "block";
-
-      const date = document.createElement("span");
-      date.textContent = `📅 ${noteData.date || "不明な日付"}`;
-      date.style.display = "block";
-
-      const useful = document.createElement("span");
-      useful.textContent =
-        noteData.useful === "yes"
-          ? "〇 役立つ"
-          : noteData.useful === "no"
-          ? "× 役立たない"
-          : "";
-      useful.style.display = "block";
-
-      const comment = document.createElement("span");
-      comment.textContent = `📝 ${noteData.comment || "（メモなし）"}`;
-      comment.style.display = "block";
-
-      const deleteBtn = document.createElement("button");
-      deleteBtn.textContent = "🗑 削除";
-      deleteBtn.style.background = "red";
-      deleteBtn.style.color = "white";
-      deleteBtn.style.border = "none";
-      deleteBtn.style.padding = "5px 10px";
-      deleteBtn.style.cursor = "pointer";
-      deleteBtn.style.marginTop = "5px";
-      deleteBtn.style.display = "block";
-
-      deleteBtn.addEventListener("click", () => {
-        if (confirm(`「${noteData.title}」のメモを削除しますか？`)) {
-          deleteComment(url);
-        }
-      });
-
-      listItem.appendChild(link);
-      listItem.appendChild(date);
-      listItem.appendChild(useful);
-      listItem.appendChild(comment);
-      listItem.appendChild(deleteBtn);
-
-      notesList.appendChild(listItem);
-    }
-  });
-} */
-
 // コメントを保存
 function saveComment(comment, useful) {
   const url = window.location.href;
@@ -262,7 +160,6 @@ function saveComment(comment, useful) {
 
     chrome.storage.local.set({ pageNotes: notes }, () => {
       updateLinkStyles();
-      //updateNotesList();
     });
   });
 }
@@ -277,7 +174,6 @@ function deleteComment(specificUrl) {
 
     chrome.storage.local.set({ pageNotes: notes }, () => {
       updateLinkStyles();
-      //updateNotesList();
     });
   });
 }
@@ -286,7 +182,17 @@ function deleteComment(specificUrl) {
 function updateLinkStyles() {
   chrome.storage.local.get(["pageNotes"], (result) => {
     const notes = result.pageNotes || {};
-    const links = document.querySelectorAll("a:has(h3)");
+    let links = [];
+
+    if (location.hostname.includes("google.com")) {
+      // Google 通常検索
+      links = Array.from(document.querySelectorAll("a:has(h3)"));
+    }
+
+    if (location.hostname.includes("scholar.google.co.jp")) {
+      // Google Scholar
+      links = Array.from(document.querySelectorAll("h3.gs_rt a"));
+    }
 
     links.forEach((link) => {
       if (!link.href) return;
@@ -323,8 +229,7 @@ function showTooltip(element, noteData) {
 
     // usefulプロパティが存在する場合は、ステータスも表示
     if (noteData.useful) {
-      const usefulStatus =
-        noteData.useful === "yes" ? "〇 必要" : "× 不要";
+      const usefulStatus = noteData.useful === "yes" ? "〇 必要" : "× 不要";
       tooltipContent = `
         <div class="tooltip-status ${noteData.useful}">${usefulStatus}</div>
         ${tooltipContent}
@@ -423,7 +328,17 @@ function setTranslate(x, y) {
 
 // 検索結果ページでのホバー表示処理
 function setupSearchResultsHover() {
-  const links = document.querySelectorAll("a:has(h3)");
+  let links = [];
+
+  if (location.hostname.includes("google.com")) {
+    // Google 通常検索
+    links = Array.from(document.querySelectorAll("a:has(h3)"));
+  }
+
+  if (location.hostname.includes("scholar.google.co.jp")) {
+    // Google Scholar
+    links = Array.from(document.querySelectorAll("h3.gs_rt a"));
+  }
 
   links.forEach((link) => {
     if (!link.href) return;
@@ -511,4 +426,287 @@ if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", initialize);
 } else {
   initialize();
+}
+
+//auto削除
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === "updateLinkStyles") {
+    try {
+      updateLinkStyles();
+      setupSearchResultsHover();
+      if (sendResponse) sendResponse({ success: true });
+    } catch (error) {
+      console.error("Error updating link styles:", error);
+      if (sendResponse) sendResponse({ success: false, error: error.message });
+    }
+  }
+  return true; // 非同期レスポンスのために true を返す
+});
+
+// スタイルをページに追加する関数
+function injectStyles() {
+  if (document.getElementById("memo-pad-styles")) return;
+
+  const styleElement = document.createElement("style");
+  styleElement.id = "memo-pad-styles";
+  styleElement.textContent = `
+    /* メモ用紙風スタイル */
+    .page-notes-window {
+      background-color: #fffdf0; /* 薄い黄色の背景色 (クリーム色) */
+      border: 1px solid #e0d8b0;
+      border-radius: 2px;
+      font-family: "Comic Sans MS", "Arial", sans-serif;
+      position: fixed;
+      width: 320px;
+      z-index: 9999;
+      /* メモ用紙のような影を付ける */
+      box-shadow: 
+        0 1px 3px rgba(0,0,0,0.12), 
+        0 1px 2px rgba(0,0,0,0.24),
+        2px 2px 0 rgba(0,0,0,0.1);
+      /* メモが少し傾いているような効果 */
+      transform-origin: top left;
+      transform: translate(0, 0) rotate(0.5deg);
+    }
+
+    /* メモのヘッダー部分 */
+    .page-notes-header {
+      background-color: #ffeb99; /* 少し濃い黄色 */
+      padding: 10px;
+      cursor: move;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px dashed #ccc; /* 点線の区切り */
+      font-weight: bold;
+      color: #555;
+      position: relative;
+    }
+
+    /* タイトル部分をデコレーション */
+    .page-notes-header span {
+      font-family: "Comic Sans MS", "Arial", sans-serif;
+      color: #8b4513; /* 茶色のテキスト */
+      text-shadow: 1px 1px 1px rgba(0,0,0,0.1);
+    }
+
+    /* メモのテキストエリア */
+    .page-notes-textarea {
+      width: 100%;
+      height: 150px;
+      padding: 10px;
+      border: none;
+      background-color: #fffdf0;
+      font-family: "Comic Sans MS", "Arial", sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+      resize: vertical;
+      box-sizing: border-box;
+      background-image: linear-gradient(#e1e1e1 1px, transparent 1px);
+      background-size: 100% 24px; /* 罫線の間隔 */
+      background-position: 0 20px;
+      padding-top: 20px; /* 最初の行のスペース */
+      box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
+    }
+
+    /* 選択ボタン部分 */
+    .page-notes-selection {
+      display: flex;
+      padding: 10px;
+      background-color: #fffdf0;
+      border-top: 1px dashed #e0d8b0;
+    }
+
+    /* 選択ボタンのスタイル */
+    .selection-button {
+      flex: 1;
+      padding: 8px;
+      margin: 0 5px;
+      text-align: center;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background-color 0.3s;
+      border: 1px solid #e0d8b0;
+      background-color: #fffdf0;
+    }
+
+    .selection-button:hover {
+      background-color: #fff8cc;
+    }
+
+    .selection-button.selected {
+      background-color: #ffeb99;
+      font-weight: bold;
+    }
+
+    .selection-button.yes.selected {
+      border-color: #4caf50;
+      color: #4caf50;
+    }
+
+    .selection-button.no.selected {
+      border-color: #f44336;
+      color: #f44336;
+    }
+
+    /* ボタン部分 */
+    .page-notes-buttons {
+      display: flex;
+      padding: 10px;
+      justify-content: space-between;
+      background-color: #fffdf0;
+      border-top: 1px dashed #e0d8b0;
+    }
+
+    /* ボタンのスタイル */
+    .page-notes-buttons button {
+      padding: 8px 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: "Comic Sans MS", "Arial", sans-serif;
+      font-size: 13px;
+      transition: all 0.3s;
+    }
+
+    .page-notes-save {
+      background-color: #4CAF50;
+      color: white;
+      border-color: #4CAF50;
+    }
+
+    .page-notes-save:hover {
+      background-color: #45a049;
+    }
+
+    .page-notes-delete {
+      background-color: #f44336;
+      color: white;
+      border-color: #f44336;
+    }
+
+    .page-notes-delete:hover {
+      background-color: #d32f2f;
+    }
+
+    /* ピン留め効果のための装飾 */
+    .page-notes-window::before {
+      content: "";
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      background: radial-gradient(circle, #f44336 20%, #d32f2f 100%);
+      border-radius: 50%;
+      top: -15px;
+      right: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      z-index: 1;
+    }
+
+    .page-notes-window::after {
+      content: "";
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: #fff;
+      border-radius: 50%;
+      top: -10px;
+      right: 25px;
+      box-shadow: inset 0 0 3px rgba(0,0,0,0.2);
+      z-index: 2;
+    }
+
+    /* ツールチップのスタイル */
+    .page-notes-tooltip {
+      position: absolute;
+      background-color: #fffdf0;
+      border: 1px solid #e0d8b0;
+      padding: 10px;
+      border-radius: 5px;
+      font-family: "Comic Sans MS", "Arial", sans-serif;
+      font-size: 13px;
+      max-width: 300px;
+      z-index: 10000;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .tooltip-status {
+      font-weight: bold;
+      margin-bottom: 5px;
+      padding: 3px;
+      border-radius: 3px;
+    }
+
+    .tooltip-status.yes {
+      background-color: #e8f5e9;
+      color: #4caf50;
+    }
+
+    .tooltip-status.no {
+      background-color: #ffebee;
+      color: #f44336;
+    }
+
+    .tooltip-text {
+      line-height: 1.4;
+    }
+
+    /* ドラッグ中のスタイル */
+    .page-notes-window.dragging {
+      opacity: 0.8;
+      cursor: grabbing;
+    }
+
+    /* メモ用紙のようなテープ効果 */
+    .page-notes-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 20px;
+      width: 40%;
+      height: 10px;
+      background: rgba(255, 235, 153, 0.8);
+      border-bottom-left-radius: 5px;
+      border-bottom-right-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    /* アニメーション効果 */
+    @keyframes paperFlutter {
+      0% { transform: translate(0, 0) rotate(0.5deg); }
+      25% { transform: translate(1px, 0) rotate(0.7deg); }
+      50% { transform: translate(0, 1px) rotate(0.5deg); }
+      75% { transform: translate(-1px, 0) rotate(0.3deg); }
+      100% { transform: translate(0, 0) rotate(0.5deg); }
+    }
+
+    .page-notes-window:hover {
+      animation: paperFlutter 5s infinite ease-in-out;
+    }
+  `;
+
+  document.head.appendChild(styleElement);
+}
+
+// 初期化時にスタイルを注入
+function initialize() {
+  if (!isExtensionContextValid()) {
+    console.error("Extension context invalid during initialization");
+    return;
+  }
+
+  try {
+    // スタイルを注入
+    injectStyles();
+
+    setupSearchResultsHover();
+    updateLinkStyles();
+
+    // MutationObserverを設定
+    mutationObserver = setupMutationObserver();
+
+    notifyReady();
+  } catch (error) {
+    console.error("Error during initialization:", error);
+  }
 }

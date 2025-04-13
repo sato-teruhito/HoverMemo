@@ -32,5 +32,11 @@
     "16": "icons/icon1.png",
     "48": "icons/icon2.png",
     "128": "icons/icon3.png"
-  }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["notepaper-background.svg"],
+      "matches": ["<all_urls>"]
+    }
+  ]
 }
