@@ -35,7 +35,7 @@ function createCommentWindow() {
           <button class="page-notes-close">×</button>
         </div>
       </div>
-      <textarea class="page-notes-textarea">${existingComment}</textarea>
+      <textarea class="page-notes-textarea" placeholder="ここにメモを入力...">${existingComment}</textarea>
       <div class="page-notes-selection">
         <label class="selection-button yes ${
           existingUseful === "yes" ? "selected" : ""
