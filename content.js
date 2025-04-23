@@ -175,21 +175,39 @@ function deleteComment(specificUrl) {
   });
 }
 
+function getSearchResultLinks() {
+  let links = [];
+
+  const host = location.hostname;
+
+  if (host === "www.google.com" || host === "www.google.co.jp") {
+    // Google 通常検索
+    links = Array.from(document.querySelectorAll("a:has(h3)"));
+  } else if (host === "scholar.google.com" || host === "scholar.google.co.jp") {
+    // Google Scholar
+    links = Array.from(document.querySelectorAll("h3.gs_rt a"));
+  } else if (host === "search.yahoo.com" || host === "search.yahoo.co.jp") {
+    // Yahoo! Japan
+    links = Array.from(document.querySelectorAll(".sw-Card__title a"));
+  } else if (host == "bing.com" || host === "bing.co.jp") {
+    // Bing
+    links = Array.from(document.querySelectorAll("a.b_ads1line"));
+  } else if (host === "zenn.dev") {
+    // Zenn 記事ページ・トップなど
+    links = Array.from(document.querySelectorAll("a.ArticleList_link__4Igs4"));
+  } else if (host === "qiita.com") {
+    // Qiita 記事一覧
+    links = Array.from(document.querySelectorAll("h2.style-1ws5e6r a, h3.style-1eiv6gj a"));
+  }
+
+  return links;
+}
+
 // リンクのスタイルを更新
 function updateLinkStyles() {
   chrome.storage.local.get(["pageNotes"], (result) => {
     const notes = result.pageNotes || {};
-    let links = [];
-
-    if (location.hostname.includes("google.com")) {
-      // Google 通常検索
-      links = Array.from(document.querySelectorAll("a:has(h3)"));
-    }
-
-    if (location.hostname.includes("scholar.google.co.jp")) {
-      // Google Scholar
-      links = Array.from(document.querySelectorAll("h3.gs_rt a"));
-    }
+    const links = getSearchResultLinks();
 
     links.forEach((link) => {
       if (!link.href) return;
@@ -325,17 +343,7 @@ function setTranslate(x, y) {
 
 // 検索結果ページでのホバー表示処理
 function setupSearchResultsHover() {
-  let links = [];
-
-  if (location.hostname.includes("google.com")) {
-    // Google 通常検索
-    links = Array.from(document.querySelectorAll("a:has(h3)"));
-  }
-
-  if (location.hostname.includes("scholar.google.co.jp")) {
-    // Google Scholar
-    links = Array.from(document.querySelectorAll("h3.gs_rt a"));
-  }
+  const links = getSearchResultLinks();
 
   links.forEach((link) => {
     if (!link.href) return;
@@ -438,3 +446,192 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
   return true; // 非同期レスポンスのために true を返す
 });
+
+// SPAサイト対応：ページの変更を検出するためのMutationObserver
+let mutationObserver = null;
+let historyStateWatcherSetup = false;
+
+// SPAサイト対応のためのコード初期化
+function initSPASupport() {
+  try {
+    // 既に初期化済みの場合は何もしない
+    if (mutationObserver) return;
+    
+    // 現在のサイトがZennかどうか確認
+    const currentHost = window.location.hostname;
+    const isZennSite = currentHost === 'zenn.dev';
+    
+    // Zenn以外のサイトの場合は初期化しない
+    if (!isZennSite) {
+      console.log("現在のサイトはZennではないため、SPA対応機能を無効化します。");
+      return;
+    }
+    
+    console.log("Zenn向けのSPA対応機能を初期化しています...");
+    
+    // DOM変更の監視を設定
+    setupMutationObserver();
+    
+    // History API（戻る・進むボタン対応など）の監視を設定
+    setupHistoryStateWatcher();
+  } catch (error) {
+    console.error("SPA対応初期化中にエラーが発生しました:", error);
+  }
+}
+
+// DOM変更を監視するMutationObserverの設定
+function setupMutationObserver() {
+  try {
+    // 既存のObserverをクリーンアップ
+    if (mutationObserver) {
+      mutationObserver.disconnect();
+    }
+    
+    // 新しいObserverを作成
+    mutationObserver = new MutationObserver(
+      debounce((mutations) => {
+        try {
+          // Zennの記事一覧や記事ページが更新された可能性がある
+          console.log("Zennページの変更を検出しました - リンクスタイルを更新します");
+          
+          // リンクスタイルとホバー機能を更新
+          updateLinkStyles();
+          setupSearchResultsHover();
+        } catch (error) {
+          console.error("MutationObserverのコールバック中にエラーが発生しました:", error);
+        }
+      }, 800)  // デバウンス時間を調整
+    );
+    
+    // Zennのメインコンテンツエリアを監視
+    const zennContentContainers = document.querySelectorAll('.container, main, .ArticleList');
+    
+    if (zennContentContainers.length > 0) {
+      zennContentContainers.forEach(container => {
+        mutationObserver.observe(container, {
+          childList: true,
+          subtree: true
+        });
+      });
+      console.log("Zennのコンテンツエリアの監視を開始しました");
+    } else {
+      // 特定のコンテナが見つからない場合はbody全体を監視
+      mutationObserver.observe(document.body, {
+        childList: true,
+        subtree: true
+      });
+      console.log("Zennの特定コンテナが見つからないため、body全体の監視を開始しました");
+    }
+  } catch (error) {
+    console.error("MutationObserverの設定中にエラーが発生しました:", error);
+  }
+}
+
+// 安全にHistory APIを拡張する関数
+function safelyWrapHistoryMethod(originalMethod, methodName) {
+  return function() {
+    try {
+      // 元の関数を呼び出す
+      originalMethod.apply(this, arguments);
+      
+      // Zennサイトの場合のみ処理を実行
+      if (window.location.hostname === 'zenn.dev') {
+        console.log(`Zennでの${methodName}検出 - リンクスタイルを更新します`);
+        setTimeout(() => {
+          try {
+            updateLinkStyles();
+            setupSearchResultsHover();
+          } catch (error) {
+            console.error(`${methodName}後の更新処理中にエラーが発生しました:`, error);
+          }
+        }, 300);
+      }
+    } catch (error) {
+      console.error(`History APIの${methodName}実行中にエラーが発生しました:`, error);
+      // エラーが発生した場合でも元の関数を実行
+      try {
+        originalMethod.apply(this, arguments);
+      } catch (e) {
+        console.error(`元の${methodName}実行時にもエラーが発生しました:`, e);
+      }
+    }
+  };
+}
+
+// History API変更を検知する関数
+function setupHistoryStateWatcher() {
+  try {
+    // 既に設定済みの場合は何もしない
+    if (historyStateWatcherSetup) return;
+    
+    // 元のHistory APIメソッドを保存
+    const originalPushState = history.pushState;
+    const originalReplaceState = history.replaceState;
+    
+    // 安全にラップしたメソッドを設定
+    history.pushState = safelyWrapHistoryMethod(originalPushState, 'pushState');
+    history.replaceState = safelyWrapHistoryMethod(originalReplaceState, 'replaceState');
+    
+    // popstateイベントのリスナー設定（ブラウザの戻る・進むボタン対応）
+    window.addEventListener('popstate', () => {
+      try {
+        // Zennサイトの場合のみ処理を実行
+        if (window.location.hostname === 'zenn.dev') {
+          console.log("Zennでのpopstate検出 - リンクスタイルを更新します");
+          setTimeout(() => {
+            updateLinkStyles();
+            setupSearchResultsHover();
+          }, 300);
+        }
+      } catch (error) {
+        console.error("popstateイベント処理中にエラーが発生しました:", error);
+      }
+    });
+    
+    historyStateWatcherSetup = true;
+  } catch (error) {
+    console.error("History API監視の設定中にエラーが発生しました:", error);
+  }
+}
+
+// 連続実行を防止するデバウンス関数
+function debounce(func, wait) {
+  let timeout;
+  return function() {
+    const context = this;
+    const args = arguments;
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+      try {
+        func.apply(context, args);
+      } catch (error) {
+        console.error("デバウンス関数の実行中にエラーが発生しました:", error);
+      }
+    }, wait);
+  };
+}
+
+// 既存の初期化関数を拡張（エラーハンドリング追加）
+const originalInitialize = initialize;
+initialize = function() {
+  try {
+    // 既存の初期化処理を実行
+    if (typeof originalInitialize === 'function') {
+      originalInitialize();
+    }
+    
+    // SPA対応の初期化を追加
+    initSPASupport();
+  } catch (error) {
+    console.error("初期化処理中にエラーが発生しました:", error);
+  }
+};
+
+// 既存のページが既に読み込まれている場合にも初期化を実行
+if (document.readyState !== "loading") {
+  try {
+    initSPASupport();
+  } catch (error) {
+    console.error("SPA対応の初期化中にエラーが発生しました:", error);
+  }
+}
